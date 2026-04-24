@@ -1,14 +1,6 @@
 # Ragent 文档站
 
-这是基于 `D:\git-localRepository\ragent\docs\ragent-open-study-guide.md` 生成的本地阅读网站。
-
-## 打开方式
-
-直接用浏览器打开：
-
-```text
-D:\git-localRepository\ragent-doc-site\index.html
-```
+这是基于 `https://nageoffer.com/ragent/` 生成的项目说明网站。
 
 ## 文件说明
 
