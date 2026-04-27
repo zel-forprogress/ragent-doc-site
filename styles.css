@@ -277,6 +277,7 @@ a:hover {
   line-height: 1.25;
   color: #17211b;
   letter-spacing: 0;
+  scroll-margin-top: 90px;
 }
 
 .doc h1 {

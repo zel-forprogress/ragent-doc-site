@@ -142,7 +142,7 @@ for (const button of menuToggles) {
   }
 }
 
-// Open groups containing current page
+// Open groups containing current page and scroll to anchor
 if (location.hash) {
   const id = location.hash.slice(1);
   const active = document.querySelector(`.menu-link[href$="#${id}"], .menu-toggle[data-target="${id}"]`);
