@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>AI 知识问答篇</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="ai-qa-advanced">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -227,10 +227,10 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./ai-qa-advanced.html#s1-多通道检索" class="menu-link depth-1" data-heading="一次问答从前端到后端">一次问答从前端到后端</a>
-<a href="./ai-qa-advanced.html#s2-为什么要意图定向检索" class="menu-link depth-1" data-heading="为什么要意图树">为什么要意图树</a>
-<a href="./ai-qa-advanced.html#s3-空检索怎么处理" class="menu-link depth-1" data-heading="为什么要查询词映射">为什么要查询词映射</a>
-<a href="./ai-qa-advanced.html#114-为什么要-trace" class="menu-link depth-1" data-heading="为什么要Trace">为什么要Trace</a>
+          <a href="#s1-多通道检索" class="menu-link depth-1" data-heading="一次问答从前端到后端">一次问答从前端到后端</a>
+<a href="#s2-为什么要意图定向检索" class="menu-link depth-1" data-heading="为什么要意图树">为什么要意图树</a>
+<a href="#s3-空检索怎么处理" class="menu-link depth-1" data-heading="为什么要查询词映射">为什么要查询词映射</a>
+<a href="#114-为什么要-trace" class="menu-link depth-1" data-heading="为什么要Trace">为什么要Trace</a>
         </div>
       </div>
 <div class="menu-group depth-0">
@@ -269,82 +269,157 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="s-ai-知识问答篇">AI 知识问答篇<a class="heading-anchor" href="#s-ai-知识问答篇" aria-label="Link to AI 知识问答篇">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
-
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="s1-多通道检索">多通道检索<a class="heading-anchor" href="#s1-多通道检索" aria-label="Link to 多通道检索">#</a></h3>
+<p>核心类：</p>
+<pre><code class="language-text">MultiChannelRetrievalEngine</code></pre>
+<p>执行过程：</p>
+<pre><code class="language-text">找到启用的 SearchChannel
+  -&gt; 并行执行
+  -&gt; 收集结果
+  -&gt; 执行后处理器链
+  -&gt; 返回最终 chunks</code></pre>
+<p>已实现通道：</p>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>通道</th>
+<th>类</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td>全局向量检索</td>
+<td><code>VectorGlobalSearchChannel</code></td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td>意图定向检索</td>
+<td><code>IntentDirectedSearchChannel</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>后处理：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>后处理</th>
+<th>类</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>去重</td>
+<td><code>DeduplicationPostProcessor</code></td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
-</tr>
-<tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
-</tr>
-<tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
-</tr>
-<tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td>重排</td>
+<td><code>RerankPostProcessor</code></td>
 </tr>
 </tbody>
 </table></div>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="s2-为什么要意图定向检索">为什么要意图定向检索<a class="heading-anchor" href="#s2-为什么要意图定向检索" aria-label="Link to 为什么要意图定向检索">#</a></h3>
+<p>如果所有问题都全局搜，容易搜到无关文档。意图树可以先判断问题属于哪个业务域，再缩小检索范围。</p>
+<p>例如：</p>
+<pre><code class="language-text">用户问“密码怎么重置”</code></pre>
+<p>意图树可以定位到：</p>
+<pre><code class="language-text">IT 支持 -&gt; 账号权限</code></pre>
+<p>这样比全库检索更稳定。</p>
+
+<h3 id="s3-空检索怎么处理">空检索怎么处理<a class="heading-anchor" href="#s3-空检索怎么处理" aria-label="Link to 空检索怎么处理">#</a></h3>
+<p>Ragent 在 <code>handleEmptyRetrieval</code> 中处理空结果。</p>
+<p>它不会让模型硬编，而是返回：</p>
+<pre><code class="language-text">未检索到与问题相关的文档内容</code></pre>
+<p>这是 RAG 系统很重要的边界意识。</p>
+<p>---</p>
+
+<h2 id="11-ai-知识问答篇">AI 知识问答篇<a class="heading-anchor" href="#11-ai-知识问答篇" aria-label="Link to AI 知识问答篇">#</a></h2>
+
+<h3 id="111-一次问答从前端到后端">一次问答从前端到后端<a class="heading-anchor" href="#111-一次问答从前端到后端" aria-label="Link to 一次问答从前端到后端">#</a></h3>
+<p>前端：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li><code>ChatInput.tsx</code> 收集输入。</li>
+<li><code>chatService.ts</code> 发起请求。</li>
+<li><code>useStreamResponse.ts</code> 处理 SSE。</li>
+<li><code>MessageList.tsx</code> 渲染消息。</li>
 </ul>
+<p>后端：</p>
+<ul>
+<li><code>RAGChatController</code> 接收请求。</li>
+<li><code>RAGChatServiceImpl</code> 创建会话 ID、任务 ID、回调。</li>
+<li><code>StreamChatPipeline</code> 执行完整链路。</li>
+</ul>
+
+<h3 id="112-为什么要意图树">为什么要意图树<a class="heading-anchor" href="#112-为什么要意图树" aria-label="Link to 为什么要意图树">#</a></h3>
+<p>如果所有问题都做全局向量检索，会出现两个问题：</p>
+<ul>
+<li>检索范围太大，容易找错。</li>
+<li>不知道什么时候该调用工具。</li>
+</ul>
+<p>意图树的作用是给问题先分类。例如：</p>
+<pre><code class="language-text">企业制度 -&gt; 人事制度 -&gt; 请假流程
+企业制度 -&gt; IT 支持 -&gt; 账号权限
+业务工具 -&gt; 天气查询
+业务工具 -&gt; 票务查询</code></pre>
+<p>Ragent 的意图节点表：</p>
+<pre><code class="language-text">t_intent_node</code></pre>
+<p>前端管理页面：</p>
+<pre><code class="language-text">frontend/src/pages/admin/intent-tree</code></pre>
+
+<h3 id="113-为什么要查询词映射">为什么要查询词映射<a class="heading-anchor" href="#113-为什么要查询词映射" aria-label="Link to 为什么要查询词映射">#</a></h3>
+<p>用户说法和文档说法不一定一致：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>用户说法</th>
+<th>文档说法</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>报销</td>
+<td>费用报销</td>
+</tr>
+<tr>
+<td>入职</td>
+<td>员工入职流程</td>
+</tr>
+<tr>
+<td>电脑坏了</td>
+<td>IT 设备故障</td>
+</tr>
+</tbody>
+</table></div>
+<p>查询词映射可以把口语词转换成更适合检索的业务词。</p>
+<p>核心类：</p>
+<ul>
+<li><code>QueryTermMappingService</code></li>
+<li><code>QueryTermMappingCacheManager</code></li>
+<li><code>QueryTermMappingAdminService</code></li>
+</ul>
+<p>数据表：</p>
+<pre><code class="language-text">t_query_term_mapping</code></pre>
+
+<h3 id="114-为什么要-trace">为什么要 Trace<a class="heading-anchor" href="#114-为什么要-trace" aria-label="Link to 为什么要 Trace">#</a></h3>
+<p>RAG 出错时，不能只看最终答案。你要知道：</p>
+<ul>
+<li>问题改写成了什么。</li>
+<li>识别到了什么意图。</li>
+<li>检索到了哪些 chunk。</li>
+<li>Rerank 后排序如何。</li>
+<li>Prompt 最后组装了什么。</li>
+<li>模型调用是否失败。</li>
+</ul>
+<p>Ragent 用 Trace 记录这些信息。</p>
+<p>核心类：</p>
+<ul>
+<li><code>RagTraceAspect</code></li>
+<li><code>RagTraceContext</code></li>
+<li><code>RagTraceRecordService</code></li>
+<li><code>RagTraceQueryService</code></li>
+</ul>
+<p>数据表：</p>
+<ul>
+<li><code>t_rag_trace_run</code></li>
+<li><code>t_rag_trace_node</code></li>
+</ul>
+<p>前端页面：</p>
+<pre><code class="language-text">frontend/src/pages/admin/traces</code></pre>
 <p>---</p>
 
       </article>

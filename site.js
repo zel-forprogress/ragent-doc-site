@@ -8,6 +8,9 @@ const menuLinks = Array.from(document.querySelectorAll(".menu-link"));
 const menuToggles = Array.from(document.querySelectorAll(".menu-toggle"));
 const headings = Array.from(document.querySelectorAll(".doc h1, .doc h2, .doc h3"));
 
+const currentPath = location.pathname.split("/").pop() || "index.html";
+const currentPageId = currentPath.replace(".html", "");
+
 function openGroup(group) {
   if (group) group.classList.add("open");
 }
@@ -23,13 +26,20 @@ function openParents(element) {
 function setActive(id) {
   let activeElement = null;
   for (const link of menuLinks) {
-    const active = link.getAttribute("href") === `#${id}`;
+    const href = link.getAttribute("href");
+    const isAnchor = href.startsWith("#");
+    const linkPage = isAnchor ? currentPageId : href.replace("./", "").split("#")[0].replace(".html", "");
+    const linkId = isAnchor ? href.slice(1) : (href.includes("#") ? href.split("#")[1] : "");
+    const active = linkPage === currentPageId && (isAnchor ? linkId === id : true);
     link.classList.toggle("active", active);
     if (active) activeElement = link;
   }
   for (const button of menuToggles) {
-    button.classList.toggle("active", button.dataset.target === id);
-    if (button.dataset.target === id) activeElement = button;
+    const targetId = button.dataset.target;
+    const targetPage = button.dataset.page;
+    const active = targetPage === currentPageId && targetId === id;
+    button.classList.toggle("active", active);
+    if (active) activeElement = button;
   }
   openParents(activeElement);
 }
@@ -49,9 +59,17 @@ for (const heading of headings) observer.observe(heading);
 for (const button of menuToggles) {
   button.addEventListener("click", () => {
     const group = button.closest(".menu-group");
+    const targetPage = button.dataset.page;
+    const targetId = button.dataset.target;
+
+    if (targetPage && targetPage !== currentPageId) {
+      location.href = `./${targetPage}.html#${targetId}`;
+      return;
+    }
+
     group?.classList.toggle("open");
-    if (button.dataset.target) {
-      location.hash = button.dataset.target;
+    if (targetId) {
+      location.hash = targetId;
     }
   });
 }
@@ -73,7 +91,12 @@ menuToggle?.addEventListener("click", () => {
 });
 
 sidebar?.addEventListener("click", (event) => {
-  if (event.target.closest("a")) sidebar.classList.remove("open");
+  const link = event.target.closest("a");
+  if (!link) return;
+  const href = link.getAttribute("href");
+  if (href.startsWith("#")) {
+    sidebar.classList.remove("open");
+  }
 });
 
 searchInput?.addEventListener("input", () => {
@@ -100,9 +123,31 @@ doc.addEventListener("click", async (event) => {
   }
 });
 
+// Highlight current page in navigation
+for (const link of menuLinks) {
+  const href = link.getAttribute("href");
+  const isAnchor = href.startsWith("#");
+  const linkPage = isAnchor ? currentPageId : href.replace("./", "").split("#")[0].replace(".html", "");
+  if (linkPage === currentPageId) {
+    link.classList.add("active");
+    openParents(link);
+  }
+}
+
+for (const button of menuToggles) {
+  const targetPage = button.dataset.page;
+  if (targetPage === currentPageId) {
+    button.classList.add("active");
+    openParents(button);
+  }
+}
+
+// Open groups containing current page
 if (location.hash) {
-  const active = document.querySelector(`.menu-link[href="${location.hash}"], .menu-toggle[data-target="${location.hash.slice(1)}"]`);
+  const id = location.hash.slice(1);
+  const active = document.querySelector(`.menu-link[href$="#${id}"], .menu-toggle[data-target="${id}"]`);
   openParents(active);
 } else {
-  openGroup(document.querySelector(".menu-group"));
+  const firstGroup = document.querySelector(`.menu-group:has(.menu-link.active)`);
+  if (firstGroup) openGroup(firstGroup);
 }

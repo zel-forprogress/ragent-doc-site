@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>在线体验 Ragent AI</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="online-demo">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,8 +25,8 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
-<a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+<a href="#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
         <button class="menu-toggle" type="button" data-target="d-rag-基础概念" data-page="rag-basics" data-heading="RAG基础概念">
@@ -269,81 +269,79 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="b-在线体验-ragent-ai">在线体验 Ragent AI<a class="heading-anchor" href="#b-在线体验-ragent-ai" aria-label="Link to 在线体验 Ragent AI">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
+<h3 id="b1-在线体验适合看什么">在线体验适合看什么<a class="heading-anchor" href="#b1-在线体验适合看什么" aria-label="Link to 在线体验适合看什么">#</a></h3>
+<p>在线体验适合快速观察产品形态：</p>
+<ul>
+<li>登录后的问答页长什么样。</li>
+<li>用户提问后答案是否流式输出。</li>
+<li>后台有没有知识库、意图树、Trace、模型设置等页面。</li>
+<li>知识库上传、文档分块、Trace 分析这些功能在 UI 上如何组织。</li>
+</ul>
+<p>但在线体验不适合深入学习，因为你看不到：</p>
+<ul>
+<li>后端日志。</li>
+<li>数据库表变化。</li>
+<li>RocketMQ 消息。</li>
+<li>Redis 锁和限流。</li>
+<li>向量表写入情况。</li>
+<li>大模型调用失败时如何降级。</li>
+</ul>
+<p>所以学习这个项目，一定要本地跑。</p>
 
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="b2-本地体验的完整访问地址">本地体验的完整访问地址<a class="heading-anchor" href="#b2-本地体验的完整访问地址" aria-label="Link to 本地体验的完整访问地址">#</a></h3>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>服务</th>
+<th>地址</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td>前端</td>
+<td><code>http://localhost:5174</code></td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td>后端 API</td>
+<td><code>http://localhost:9090/api/ragent</code></td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
+<td>MCP Server</td>
+<td><code>http://localhost:9099</code></td>
 </tr>
 <tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
+<td>RocketMQ Dashboard</td>
+<td>你当前 compose 映射后通常还是 <code>http://localhost:8082</code>，如果改了 dashboard 端口则按实际端口访问</td>
 </tr>
 <tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
+<td>RustFS API</td>
+<td><code>http://localhost:9000</code></td>
 </tr>
 <tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td>RustFS Console</td>
+<td><code>http://localhost:9001</code></td>
 </tr>
 </tbody>
 </table></div>
+<p>默认登录：</p>
+<pre><code class="language-text">admin / admin</code></pre>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="b3-本地体验时你应该观察什么">本地体验时你应该观察什么<a class="heading-anchor" href="#b3-本地体验时你应该观察什么" aria-label="Link to 本地体验时你应该观察什么">#</a></h3>
+<p>登录后先做 4 件事：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>打开“知识库”页面，看是否有初始化数据。</li>
+<li>打开“意图树”页面，看意图节点如何分层。</li>
+<li>打开“问答页”，发送一个简单问题。</li>
+<li>打开“Trace 页面”，看一次问答是否生成链路记录。</li>
+</ul>
+<p>如果问答失败，不要急着改代码，优先检查：</p>
+<ul>
+<li>后端是否启动成功。</li>
+<li>Redis 是否 <code>PONG</code>。</li>
+<li>PostgreSQL 是否有 <code>admin</code> 用户。</li>
+<li>RocketMQ 的 broker 是否启动。</li>
+<li>MCP 服务是否在 <code>9099</code>。</li>
+<li><code>BAILIAN_API_KEY</code> 和 <code>SILICONFLOW_API_KEY</code> 是否配置。</li>
 </ul>
 <p>---</p>
 

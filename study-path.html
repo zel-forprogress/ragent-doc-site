@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>推荐学习路线</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="study-path">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -262,88 +262,26 @@
 <a href="./faq.html#135-前端-5173-端口冲突" class="menu-link depth-1" data-heading="前端 5173 端口冲突">前端 5173 端口冲突</a>
         </div>
       </div>
-<a href="./study-path.html#14-推荐学习路线" class="menu-link depth-0" data-heading="推荐学习路线">推荐学习路线</a>
+<a href="#14-推荐学习路线" class="menu-link depth-0" data-heading="推荐学习路线">推荐学习路线</a>
 <a href="./summary.html#15-一句话总结" class="menu-link depth-0" data-heading="一句话总结">一句话总结</a>
 <div class="menu-muted depth-0">内容正在持续更新中...</div>
       </nav>
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
-
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
-
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
-<div class="table-wrap"><table>
-<thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
-</tr>
-<tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
-</tr>
-<tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
-</tr>
-<tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
-</tr>
-<tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
-</tr>
-<tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
-</tr>
-</tbody>
-</table></div>
-
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+        <h2 id="14-推荐学习路线">推荐学习路线<a class="heading-anchor" href="#14-推荐学习路线" aria-label="Link to 推荐学习路线">#</a></h2>
+<p>如果你是第一次学这个项目，建议这样读：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>先跑起来：中间件、数据库、MCP、后端、前端。</li>
+<li>登录后台：看知识库、意图树、Trace 页面。</li>
+<li>看数据库：理解每张表存什么。</li>
+<li>看文档上传：从 <code>KnowledgeDocumentController</code> 读到 <code>KnowledgeDocumentServiceImpl</code>。</li>
+<li>看问答链路：从 <code>RAGChatController</code> 读到 <code>StreamChatPipeline</code>。</li>
+<li>看检索链路：读 <code>MultiChannelRetrievalEngine</code> 和两个 <code>SearchChannel</code>。</li>
+<li>看模型路由：读 <code>ModelSelector</code> 和 <code>ModelRoutingExecutor</code>。</li>
+<li>看 MCP：读 <code>mcp-server</code> 和主服务里的 <code>HttpMCPClient</code>。</li>
+<li>看 Trace：理解如何排查 RAG 效果问题。</li>
+<li>最后整理成简历和面试话术。</li>
 </ul>
 <p>---</p>
 

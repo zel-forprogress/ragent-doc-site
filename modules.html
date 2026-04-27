@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>项目模块介绍</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="modules">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -172,11 +172,11 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./modules.html#71-bootstrap" class="menu-link depth-1" data-heading="bootstrap业务入口">bootstrap业务入口</a>
-<a href="./modules.html#72-framework" class="menu-link depth-1" data-heading="framework通用能力">framework通用能力</a>
-<a href="./modules.html#73-infra-ai" class="menu-link depth-1" data-heading="infra-ai模型基础设施">infra-ai模型基础设施</a>
-<a href="./modules.html#74-mcp-server" class="menu-link depth-1" data-heading="mcp-server工具服务">mcp-server工具服务</a>
-<a href="./modules.html#75-frontend" class="menu-link depth-1" data-heading="frontend前端模块">frontend前端模块</a>
+          <a href="#71-bootstrap" class="menu-link depth-1" data-heading="bootstrap业务入口">bootstrap业务入口</a>
+<a href="#72-framework" class="menu-link depth-1" data-heading="framework通用能力">framework通用能力</a>
+<a href="#73-infra-ai" class="menu-link depth-1" data-heading="infra-ai模型基础设施">infra-ai模型基础设施</a>
+<a href="#74-mcp-server" class="menu-link depth-1" data-heading="mcp-server工具服务">mcp-server工具服务</a>
+<a href="#75-frontend" class="menu-link depth-1" data-heading="frontend前端模块">frontend前端模块</a>
         </div>
       </div>
 <div class="menu-group depth-0">
@@ -269,82 +269,282 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="o-项目模块介绍">项目模块介绍<a class="heading-anchor" href="#o-项目模块介绍" aria-label="Link to 项目模块介绍">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
-
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="o1-bootstrap">bootstrap<a class="heading-anchor" href="#o1-bootstrap" aria-label="Link to bootstrap">#</a></h3>
+<p>这是主业务模块。你大部分时间都在看它。</p>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>包</th>
+<th>作用</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td><code>user</code></td>
+<td>登录、用户、权限</td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td><code>admin</code></td>
+<td>仪表盘统计</td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
+<td><code>knowledge</code></td>
+<td>知识库、文档、chunk</td>
 </tr>
 <tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
+<td><code>ingestion</code></td>
+<td>Pipeline 入库</td>
 </tr>
 <tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
+<td><code>rag</code></td>
+<td>问答核心</td>
 </tr>
 <tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td><code>core</code></td>
+<td>文档解析和分块</td>
 </tr>
 </tbody>
 </table></div>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="o2-framework">framework<a class="heading-anchor" href="#o2-framework" aria-label="Link to framework">#</a></h3>
+<p>通用基础设施：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>包</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>convention</code></td>
+<td>统一对象</td>
+</tr>
+<tr>
+<td><code>exception</code></td>
+<td>异常体系</td>
+</tr>
+<tr>
+<td><code>web</code></td>
+<td>Web 工具、全局异常、SSE</td>
+</tr>
+<tr>
+<td><code>mq</code></td>
+<td>RocketMQ 封装</td>
+</tr>
+<tr>
+<td><code>idempotent</code></td>
+<td>幂等</td>
+</tr>
+<tr>
+<td><code>trace</code></td>
+<td>RAG Trace</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>用户上下文</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="o3-infra-ai">infra-ai<a class="heading-anchor" href="#o3-infra-ai" aria-label="Link to infra-ai">#</a></h3>
+<p>模型基础设施：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>包</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>chat</code></td>
+<td>Chat 模型</td>
+</tr>
+<tr>
+<td><code>embedding</code></td>
+<td>Embedding 模型</td>
+</tr>
+<tr>
+<td><code>rerank</code></td>
+<td>Rerank 模型</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>模型选择和故障转移</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>模型配置</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="o4-mcp-server">mcp-server<a class="heading-anchor" href="#o4-mcp-server" aria-label="Link to mcp-server">#</a></h3>
+<p>工具服务模块，模拟外部业务系统。</p>
+
+<h3 id="o5-frontend">frontend<a class="heading-anchor" href="#o5-frontend" aria-label="Link to frontend">#</a></h3>
+<p>React 前端，既有用户问答页，也有管理后台。</p>
+<p>---</p>
+
+<h2 id="7-项目模块介绍">项目模块介绍<a class="heading-anchor" href="#7-项目模块介绍" aria-label="Link to 项目模块介绍">#</a></h2>
+
+<h3 id="71-bootstrap">bootstrap<a class="heading-anchor" href="#71-bootstrap" aria-label="Link to bootstrap">#</a></h3>
+<p><code>bootstrap</code> 是主服务模块，里面包含大部分业务。</p>
+<p>主要包：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>包</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td>登录、用户管理、Sa-Token 权限</td>
+</tr>
+<tr>
+<td><code>admin</code></td>
+<td>管理后台统计</td>
+</tr>
+<tr>
+<td><code>knowledge</code></td>
+<td>知识库、文档、分块、入库任务</td>
+</tr>
+<tr>
+<td><code>ingestion</code></td>
+<td>文档入库 Pipeline</td>
+</tr>
+<tr>
+<td><code>rag</code></td>
+<td>问答、意图、检索、Prompt、MCP Client、Trace</td>
+</tr>
+<tr>
+<td><code>core</code></td>
+<td>文档解析和文本分块</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="72-framework">framework<a class="heading-anchor" href="#72-framework" aria-label="Link to framework">#</a></h3>
+<p>通用能力模块：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>包</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>convention</code></td>
+<td>统一 Result、ChatRequest、RetrievedChunk</td>
+</tr>
+<tr>
+<td><code>exception</code></td>
+<td>业务异常体系</td>
+</tr>
+<tr>
+<td><code>web</code></td>
+<td>全局异常处理和 SSE 工具</td>
+</tr>
+<tr>
+<td><code>mq</code></td>
+<td>RocketMQ 生产者封装</td>
+</tr>
+<tr>
+<td><code>idempotent</code></td>
+<td>接口和消费幂等</td>
+</tr>
+<tr>
+<td><code>trace</code></td>
+<td>RAG Trace 上下文</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>用户上下文</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="73-infra-ai">infra-ai<a class="heading-anchor" href="#73-infra-ai" aria-label="Link to infra-ai">#</a></h3>
+<p>AI 基础设施模块：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>包</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>chat</code></td>
+<td>聊天模型客户端</td>
+</tr>
+<tr>
+<td><code>embedding</code></td>
+<td>Embedding 模型客户端</td>
+</tr>
+<tr>
+<td><code>rerank</code></td>
+<td>Rerank 模型客户端</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>模型选择、健康状态、故障转移</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>模型配置绑定</td>
+</tr>
+<tr>
+<td><code>token</code></td>
+<td>Token 估算</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="74-mcp-server">mcp-server<a class="heading-anchor" href="#74-mcp-server" aria-label="Link to mcp-server">#</a></h3>
+<p>MCP 工具服务：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>MCPEndpoint</code></td>
+<td><code>/mcp</code> HTTP 入口</td>
+</tr>
+<tr>
+<td><code>MCPDispatcher</code></td>
+<td>JSON-RPC 方法分发</td>
+</tr>
+<tr>
+<td><code>DefaultMCPToolRegistry</code></td>
+<td>工具注册表</td>
+</tr>
+<tr>
+<td><code>WeatherMCPExecutor</code></td>
+<td>天气查询示例</td>
+</tr>
+<tr>
+<td><code>TicketMCPExecutor</code></td>
+<td>票务查询示例</td>
+</tr>
+<tr>
+<td><code>SalesMCPExecutor</code></td>
+<td>销售查询示例</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="75-frontend">frontend<a class="heading-anchor" href="#75-frontend" aria-label="Link to frontend">#</a></h3>
+<p>前端技术栈：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>React 18。</li>
+<li>Vite。</li>
+<li>TypeScript。</li>
+<li>Zustand。</li>
+<li>React Router。</li>
+<li>Radix UI。</li>
+<li>Tailwind CSS。</li>
 </ul>
+<p>前端 API 统一封装在：</p>
+<pre><code class="language-text">frontend/src/services</code></pre>
+<p>状态管理在：</p>
+<pre><code class="language-text">frontend/src/stores</code></pre>
 <p>---</p>
 
       </article>

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>从零启动 Ragent</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="getting-started">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -145,9 +145,9 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./getting-started.html#m2-本地开发环境搭建" class="menu-link depth-2" data-heading="本地开发环境搭建">本地开发环境搭建</a>
-<a href="./getting-started.html#m3-docker-中间件部署" class="menu-link depth-2" data-heading="Docker中间件部署">Docker中间件部署</a>
-<a href="./getting-started.html#m4-postgresql-数据库初始化" class="menu-link depth-2" data-heading="PostgreSQL数据库初始化">PostgreSQL数据库初始化</a>
+          <a href="#m2-本地开发环境搭建" class="menu-link depth-2" data-heading="本地开发环境搭建">本地开发环境搭建</a>
+<a href="#m3-docker-中间件部署" class="menu-link depth-2" data-heading="Docker中间件部署">Docker中间件部署</a>
+<a href="#m4-postgresql-数据库初始化" class="menu-link depth-2" data-heading="PostgreSQL数据库初始化">PostgreSQL数据库初始化</a>
         </div>
       </div>
         </div>
@@ -269,82 +269,288 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="m-从零启动-ragent-前后端全流程">从零启动 Ragent —— 前后端全流程<a class="heading-anchor" href="#m-从零启动-ragent-前后端全流程" aria-label="Link to 从零启动 Ragent —— 前后端全流程">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
-
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="m1-中间件初始化">中间件初始化<a class="heading-anchor" href="#m1-中间件初始化" aria-label="Link to 中间件初始化">#</a></h3>
+<p>完整依赖：</p>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>中间件</th>
+<th>用途</th>
+<th>默认地址</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td>PostgreSQL + pgvector</td>
+<td>业务数据和向量数据</td>
+<td><code>127.0.0.1:15432</code></td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td>Redis</td>
+<td>Redisson、限流、锁</td>
+<td><code>127.0.0.1:6379</code></td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
+<td>RocketMQ</td>
+<td>文档分块异步消息</td>
+<td><code>127.0.0.1:9876</code></td>
 </tr>
 <tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
+<td>RustFS</td>
+<td>文件对象存储</td>
+<td><code>http://localhost:9000</code></td>
 </tr>
 <tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
-</tr>
-<tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td>MCP Server</td>
+<td>工具调用</td>
+<td><code>http://localhost:9099</code></td>
 </tr>
 </tbody>
 </table></div>
+<p>启动前检查 Docker：</p>
+<pre><code class="language-powershell">docker version
+docker ps</code></pre>
+<p>如果报 Docker API 错误，先打开 Docker Desktop。</p>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="m2-本地开发环境搭建">本地开发环境搭建<a class="heading-anchor" href="#m2-本地开发环境搭建" aria-label="Link to 本地开发环境搭建">#</a></h3>
+<p>需要：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>JDK 17。</li>
+<li>Node.js 18+。</li>
+<li>Docker Desktop。</li>
+<li>Maven Wrapper 使用项目自带 <code>mvnw.cmd</code> 即可。</li>
 </ul>
+<p>检查：</p>
+<pre><code class="language-powershell">java -version
+node -v
+npm -v
+docker ps</code></pre>
+
+<h3 id="m3-docker-中间件部署">Docker 中间件部署<a class="heading-anchor" href="#m3-docker-中间件部署" aria-label="Link to Docker 中间件部署">#</a></h3>
+<p>PostgreSQL：</p>
+<pre><code class="language-powershell">docker run -d --name ragent-postgres `
+  -e POSTGRES_DB=ragent `
+  -e POSTGRES_USER=postgres `
+  -e POSTGRES_PASSWORD=postgres `
+  -p 15432:5432 `
+  -v ragent-pgdata:/var/lib/postgresql/data `
+  pgvector/pgvector:pg17</code></pre>
+<p>Redis：</p>
+<pre><code class="language-powershell">docker run -d --name ragent-redis `
+  -p 6379:6379 `
+  redis:8.2.0 redis-server --requirepass 123456</code></pre>
+<p>RocketMQ：</p>
+<pre><code class="language-powershell">docker compose -f .\resources\docker\rocketmq-stack-5.2.0.compose.yaml up -d</code></pre>
+<p>RustFS：</p>
+<pre><code class="language-powershell">docker run -d --name rustfs_local `
+  -p 9000:9000 `
+  -p 9001:9001 `
+  -v rustfs-data:/data `
+  -e RUSTFS_ACCESS_KEY=rustfsadmin `
+  -e RUSTFS_SECRET_KEY=rustfsadmin `
+  rustfs/rustfs:latest `
+  --console-enable `
+  --access-key rustfsadmin `
+  --secret-key rustfsadmin `
+  /data</code></pre>
+
+<h3 id="m4-postgresql-数据库初始化">PostgreSQL 数据库初始化<a class="heading-anchor" href="#m4-postgresql-数据库初始化" aria-label="Link to PostgreSQL 数据库初始化">#</a></h3>
+<pre><code class="language-powershell">docker cp .\resources\database\schema_pg.sql ragent-postgres:/schema_pg.sql
+docker cp .\resources\database\init_data_pg.sql ragent-postgres:/init_data_pg.sql
+docker exec ragent-postgres psql -U postgres -d ragent -f /schema_pg.sql
+docker exec ragent-postgres psql -U postgres -d ragent -f /init_data_pg.sql</code></pre>
+<p>验证：</p>
+<pre><code class="language-powershell">docker exec ragent-postgres psql -U postgres -d ragent -c &quot;select username, role from t_user;&quot;</code></pre>
+
+<h3 id="m5-启动顺序">启动顺序<a class="heading-anchor" href="#m5-启动顺序" aria-label="Link to 启动顺序">#</a></h3>
+<p>第 1 个 PowerShell，MCP：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent
+.\mvnw.cmd -pl mcp-server spring-boot:run</code></pre>
+<p>第 2 个 PowerShell，后端：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent
+$env:BAILIAN_API_KEY=&quot;你的百炼Key&quot;
+$env:SILICONFLOW_API_KEY=&quot;你的SiliconFlow Key&quot;
+.\mvnw.cmd -pl bootstrap spring-boot:run</code></pre>
+<p>第 3 个 PowerShell，前端：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent\frontend
+npm install
+npm run dev</code></pre>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:5174</code></pre>
+
+<h3 id="m6-当前你机器上已经遇到过的坑">当前你机器上已经遇到过的坑<a class="heading-anchor" href="#m6-当前你机器上已经遇到过的坑" aria-label="Link to 当前你机器上已经遇到过的坑">#</a></h3>
+
+<h4 id="redis-连不上">Redis 连不上<a class="heading-anchor" href="#redis-连不上" aria-label="Link to Redis 连不上">#</a></h4>
+<p>错误：</p>
+<pre><code class="language-text">Unable to connect to Redis server: 127.0.0.1:6379</code></pre>
+<p>原因通常是 Docker Desktop 没启动，或者 <code>ragent-redis</code> 没运行。</p>
+<p>处理：</p>
+<pre><code class="language-powershell">docker ps -a
+docker start ragent-redis
+docker exec ragent-redis redis-cli -a 123456 ping</code></pre>
+
+<h4 id="postgresql-连错本机库">PostgreSQL 连错本机库<a class="heading-anchor" href="#postgresql-连错本机库" aria-label="Link to PostgreSQL 连错本机库">#</a></h4>
+<p>你机器本机 PostgreSQL 占用 <code>5432</code>，所以 Docker PostgreSQL 改成了：</p>
+<pre><code class="language-text">15432 -&gt; 5432</code></pre>
+<p>后端配置必须是：</p>
+<pre><code class="language-yaml">url: jdbc:postgresql://127.0.0.1:15432/ragent?client_encoding=UTF8</code></pre>
+
+<h4 id="前端端口冲突">前端端口冲突<a class="heading-anchor" href="#前端端口冲突" aria-label="Link to 前端端口冲突">#</a></h4>
+<p>你机器 <code>5173</code> 被其他应用占用，所以项目已改成：</p>
+<pre><code class="language-text">5174</code></pre>
+<p>---</p>
+
+<h2 id="5-从零启动-ragent">从零启动 Ragent<a class="heading-anchor" href="#5-从零启动-ragent" aria-label="Link to 从零启动 Ragent">#</a></h2>
+
+<h3 id="51-中间件初始化">中间件初始化<a class="heading-anchor" href="#51-中间件初始化" aria-label="Link to 中间件初始化">#</a></h3>
+<p>当前项目依赖这些中间件：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>中间件</th>
+<th>用途</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>PostgreSQL + pgvector</td>
+<td>业务数据和向量数据</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>分布式锁、限流、缓存、Redisson</td>
+</tr>
+<tr>
+<td>RocketMQ</td>
+<td>文档分块异步任务、反馈消息</td>
+</tr>
+<tr>
+<td>RustFS</td>
+<td>S3 兼容对象存储，保存上传文件</td>
+</tr>
+<tr>
+<td>MCP Server</td>
+<td>工具调用服务</td>
+</tr>
+</tbody>
+</table></div>
+<p>注意：源码里还保留了 Milvus 配置和实现，但当前默认向量类型是 <code>pg</code>，首次启动不用部署 Milvus。</p>
+
+<h3 id="52-本地开发环境搭建">本地开发环境搭建<a class="heading-anchor" href="#52-本地开发环境搭建" aria-label="Link to 本地开发环境搭建">#</a></h3>
+<p>需要安装：</p>
+<ul>
+<li>JDK 17。</li>
+<li>Docker Desktop。</li>
+<li>Node.js 18+。</li>
+<li>Git。</li>
+<li>IDEA 或 VS Code。</li>
+</ul>
+<p>检查命令：</p>
+<pre><code class="language-powershell">java -version
+docker version
+node -v
+npm -v</code></pre>
+<p>如果 <code>docker version</code> 报错，通常是 Docker Desktop 没启动。</p>
+
+<h3 id="53-docker-中间件部署">Docker 中间件部署<a class="heading-anchor" href="#53-docker-中间件部署" aria-label="Link to Docker 中间件部署">#</a></h3>
+
+<h4 id="postgresql">PostgreSQL<a class="heading-anchor" href="#postgresql" aria-label="Link to PostgreSQL">#</a></h4>
+<p>你当前机器上本机 PostgreSQL 占用了 <code>5432</code>，所以 Docker PostgreSQL 建议映射到 <code>15432</code>：</p>
+<pre><code class="language-powershell">docker run -d --name ragent-postgres `
+  -e POSTGRES_DB=ragent `
+  -e POSTGRES_USER=postgres `
+  -e POSTGRES_PASSWORD=postgres `
+  -p 15432:5432 `
+  -v ragent-pgdata:/var/lib/postgresql/data `
+  pgvector/pgvector:pg17</code></pre>
+<p>项目配置要对应：</p>
+<pre><code class="language-yaml">spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:15432/ragent?client_encoding=UTF8
+    username: postgres
+    password: postgres</code></pre>
+
+<h4 id="redis">Redis<a class="heading-anchor" href="#redis" aria-label="Link to Redis">#</a></h4>
+<pre><code class="language-powershell">docker run -d --name ragent-redis `
+  -p 6379:6379 `
+  redis:8.2.0 redis-server --requirepass 123456</code></pre>
+<p>验证：</p>
+<pre><code class="language-powershell">docker exec ragent-redis redis-cli -a 123456 ping</code></pre>
+<p>返回 <code>PONG</code> 表示正常。</p>
+<p>如果后端报：</p>
+<pre><code class="language-text">Unable to connect to Redis server: 127.0.0.1:6379</code></pre>
+<p>通常是：</p>
+<ul>
+<li>Docker Desktop 没启动。</li>
+<li><code>ragent-redis</code> 容器没启动。</li>
+<li><code>6379</code> 没映射出来。</li>
+</ul>
+<p>处理：</p>
+<pre><code class="language-powershell">docker ps -a
+docker start ragent-redis</code></pre>
+
+<h4 id="rocketmq">RocketMQ<a class="heading-anchor" href="#rocketmq" aria-label="Link to RocketMQ">#</a></h4>
+<p>仓库自带 compose：</p>
+<pre><code class="language-powershell">docker compose -f .\resources\docker\rocketmq-stack-5.2.0.compose.yaml up -d</code></pre>
+<p>如果 <code>8081</code> 端口冲突，可以把 compose 里的端口映射改成：</p>
+<pre><code class="language-yaml">- &quot;18081:8081&quot;
+- &quot;18082:8082&quot;</code></pre>
+<p>然后重新启动：</p>
+<pre><code class="language-powershell">docker compose -f .\resources\docker\rocketmq-stack-5.2.0.compose.yaml down
+docker compose -f .\resources\docker\rocketmq-stack-5.2.0.compose.yaml up -d</code></pre>
+
+<h4 id="rustfs">RustFS<a class="heading-anchor" href="#rustfs" aria-label="Link to RustFS">#</a></h4>
+<pre><code class="language-powershell">docker run -d --name rustfs_local `
+  -p 9000:9000 `
+  -p 9001:9001 `
+  -v rustfs-data:/data `
+  -e RUSTFS_ACCESS_KEY=rustfsadmin `
+  -e RUSTFS_SECRET_KEY=rustfsadmin `
+  -e RUSTFS_CONSOLE_ENABLE=true `
+  rustfs/rustfs:latest `
+  --console-enable `
+  --access-key rustfsadmin `
+  --secret-key rustfsadmin `
+  /data</code></pre>
+<p>项目配置：</p>
+<pre><code class="language-yaml">rustfs:
+  url: http://localhost:9000
+  access-key-id: rustfsadmin
+  secret-access-key: rustfsadmin</code></pre>
+
+<h3 id="54-postgresql-数据库初始化">PostgreSQL 数据库初始化<a class="heading-anchor" href="#54-postgresql-数据库初始化" aria-label="Link to PostgreSQL 数据库初始化">#</a></h3>
+<p>复制脚本进容器：</p>
+<pre><code class="language-powershell">docker cp .\resources\database\schema_pg.sql ragent-postgres:/schema_pg.sql
+docker cp .\resources\database\init_data_pg.sql ragent-postgres:/init_data_pg.sql</code></pre>
+<p>执行初始化：</p>
+<pre><code class="language-powershell">docker exec ragent-postgres psql -U postgres -d ragent -f /schema_pg.sql
+docker exec ragent-postgres psql -U postgres -d ragent -f /init_data_pg.sql</code></pre>
+<p>验证用户：</p>
+<pre><code class="language-powershell">docker exec ragent-postgres psql -U postgres -d ragent -c &quot;select username, role from t_user;&quot;</code></pre>
+<p>应该看到：</p>
+<pre><code class="language-text">admin | admin</code></pre>
+
+<h3 id="55-启动-mcp-服务">启动 MCP 服务<a class="heading-anchor" href="#55-启动-mcp-服务" aria-label="Link to 启动 MCP 服务">#</a></h3>
+<p>新开一个 PowerShell：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent
+.\mvnw.cmd -pl mcp-server spring-boot:run</code></pre>
+<p>看到 <code>Tomcat started on port 9099</code> 表示成功。</p>
+
+<h3 id="56-启动后端服务">启动后端服务<a class="heading-anchor" href="#56-启动后端服务" aria-label="Link to 启动后端服务">#</a></h3>
+<p>如果要正常问答，先配置 API Key：</p>
+<pre><code class="language-powershell">$env:BAILIAN_API_KEY=&quot;你的百炼Key&quot;
+$env:SILICONFLOW_API_KEY=&quot;你的SiliconFlow Key&quot;</code></pre>
+<p>然后启动：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent
+.\mvnw.cmd -pl bootstrap spring-boot:run</code></pre>
+<p>成功标志：</p>
+<pre><code class="language-text">Tomcat started on port 9090 with context path '/api/ragent'</code></pre>
+
+<h3 id="57-启动前端">启动前端<a class="heading-anchor" href="#57-启动前端" aria-label="Link to 启动前端">#</a></h3>
+<p>你当前前端端口已改成 <code>5174</code>：</p>
+<pre><code class="language-powershell">cd D:\git-localRepository\ragent\frontend
+npm install
+npm run dev</code></pre>
+<p>访问：</p>
+<pre><code class="language-text">http://localhost:5174</code></pre>
 <p>---</p>
 
       </article>

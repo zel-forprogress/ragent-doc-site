@@ -1,0 +1,1371 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG 基础概念</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="rag-basics">
+  <div class="reading-progress" id="readingProgress"></div>
+  <header class="topbar">
+    <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
+    <div class="brand">
+      <span class="brand-mark">拿</span>
+      <div>
+        <div class="brand-title">拿个offer · Java&AI 实战圈</div>
+        <div class="brand-subtitle">Ragent 开源项目学习文档</div>
+      </div>
+    </div>
+    <a class="source-link" href="../ragent/docs/ragent-open-study-guide.md">Markdown 原文</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="search-box">
+        <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
+      </div>
+      <nav class="nav" id="nav">
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+<a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
+<a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="d-rag-基础概念" data-page="rag-basics" data-heading="RAG基础概念">
+          <span>RAG基础概念</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#d1-什么是-rag-技术" class="menu-link depth-1" data-heading="什么是RAG技术?">什么是RAG技术?</a>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="e-rag-基础概念---基础篇" data-page="rag-basics" data-heading="基础篇">
+          <span>基础篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#e1-什么是大模型" class="menu-link depth-2" data-heading="什么是大模型">什么是大模型</a>
+<a href="#e2-ragent-中大模型承担哪些任务" class="menu-link depth-2" data-heading="如何调用大模型">如何调用大模型</a>
+<a href="#e3-如何调用大模型" class="menu-link depth-2" data-heading="如何写好Prompt工程">如何写好Prompt工程</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="f-rag-基础概念---数据篇" data-page="rag-basics" data-heading="数据篇">
+          <span>数据篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#f1-用-apache-tika-解析文档" class="menu-link depth-2" data-heading="为什么需要文档解析">为什么需要文档解析</a>
+<a href="#f2-为什么需要-tika" class="menu-link depth-2" data-heading="文档解析都有哪些坑">文档解析都有哪些坑</a>
+<a href="#f3-ragent-文档解析流程" class="menu-link depth-2" data-heading="Ragent中如何解析文档">Ragent中如何解析文档</a>
+<a href="#f4-数据分块-chunk-策略与实践" class="menu-link depth-2" data-heading="数据分块是什么">数据分块是什么</a>
+<a href="#85-文档分块" class="menu-link depth-2" data-heading="固定长度分块">固定长度分块</a>
+<a href="#85-文档分块" class="menu-link depth-2" data-heading="结构感知分块">结构感知分块</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="g-rag-基础概念---向量篇" data-page="rag-basics" data-heading="向量篇">
+          <span>向量篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#g1-从文本到向量理解-embedding" class="menu-link depth-2" data-heading="什么是Embedding">什么是Embedding</a>
+<a href="#g2-为什么不用普通-sql-like" class="menu-link depth-2" data-heading="什么是向量数据库">什么是向量数据库</a>
+<a href="#44-向量篇" class="menu-link depth-2" data-heading="pgvector向量存储">pgvector向量存储</a>
+<a href="#44-向量篇" class="menu-link depth-2" data-heading="Milvus向量存储">Milvus向量存储</a>
+<a href="#44-向量篇" class="menu-link depth-2" data-heading="HNSW索引与相似度">HNSW索引与相似度</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="h-rag-基础概念---应用篇" data-page="rag-basics" data-heading="应用篇">
+          <span>应用篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#81-知识库对象" class="menu-link depth-2" data-heading="知识库管理">知识库管理</a>
+<a href="#82-文档上传" class="menu-link depth-2" data-heading="文档管理">文档管理</a>
+<a href="#112-为什么要意图树" class="menu-link depth-2" data-heading="意图树管理">意图树管理</a>
+<a href="#114-为什么要-trace" class="menu-link depth-2" data-heading="Trace链路追踪">Trace链路追踪</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="i-rag-基础概念---mcp-篇" data-page="rag-basics" data-heading="MCP篇">
+          <span>MCP篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#46-mcp-篇" class="menu-link depth-2" data-heading="MCP是什么">MCP是什么</a>
+<a href="#o4-mcp-server" class="menu-link depth-2" data-heading="MCP Server">MCP Server</a>
+<a href="#46-mcp-篇" class="menu-link depth-2" data-heading="tools/list与tools/call">tools/list与tools/call</a>
+<a href="#46-mcp-篇" class="menu-link depth-2" data-heading="Ragent如何调用MCP">Ragent如何调用MCP</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="j-rag-基础概念---对话增强篇" data-page="rag-basics" data-heading="对话增强篇">
+          <span>对话增强篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#61-会话记忆" class="menu-link depth-2" data-heading="会话记忆">会话记忆</a>
+<a href="#62-问题改写" class="menu-link depth-2" data-heading="问题改写">问题改写</a>
+<a href="#47-对话增强篇" class="menu-link depth-2" data-heading="多问题拆分">多问题拆分</a>
+<a href="#47-对话增强篇" class="menu-link depth-2" data-heading="意图澄清">意图澄清</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="48-数据传输协议" data-page="rag-basics" data-heading="数据传输协议">
+          <span>数据传输协议</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#48-数据传输协议" class="menu-link depth-2" data-heading="SSE协议与流式响应">SSE协议与流式响应</a>
+<a href="#48-数据传输协议" class="menu-link depth-2" data-heading="SpringBoot SSE服务端实战">SpringBoot SSE服务端实战</a>
+        </div>
+      </div>
+<div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="ragent-开源项目平替学习文档" data-page="rag-basics" data-heading="模型检索生成评估与优化">
+          <span>模型检索生成评估与优化</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="#ragent-开源项目平替学习文档" class="menu-link depth-2" data-heading="检索效果怎么判断">检索效果怎么判断</a>
+<a href="#ragent-开源项目平替学习文档" class="menu-link depth-2" data-heading="召回率与准确率">召回率与准确率</a>
+<a href="#123-为什么要-rerank" class="menu-link depth-2" data-heading="Rerank优化">Rerank优化</a>
+<a href="#114-为什么要-trace" class="menu-link depth-2" data-heading="Trace辅助调优">Trace辅助调优</a>
+        </div>
+      </div>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="m-从零启动-ragent-前后端全流程" data-page="getting-started" data-heading="从零启动Ragent——前后端全流程">
+          <span>从零启动Ragent——前后端全流程</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <div class="menu-group depth-1">
+        <button class="menu-toggle" type="button" data-target="m1-中间件初始化" data-page="getting-started" data-heading="中间件初始化">
+          <span>中间件初始化</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./getting-started.html#m2-本地开发环境搭建" class="menu-link depth-2" data-heading="本地开发环境搭建">本地开发环境搭建</a>
+<a href="./getting-started.html#m3-docker-中间件部署" class="menu-link depth-2" data-heading="Docker中间件部署">Docker中间件部署</a>
+<a href="./getting-started.html#m4-postgresql-数据库初始化" class="menu-link depth-2" data-heading="PostgreSQL数据库初始化">PostgreSQL数据库初始化</a>
+        </div>
+      </div>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="n-ai-知识问答" data-page="ai-qa" data-heading="AI知识问答">
+          <span>AI知识问答</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./ai-qa.html#n1-用户提问后发生了什么" class="menu-link depth-1" data-heading="会话记忆">会话记忆</a>
+<a href="./ai-qa.html#n2-streamchatpipeline-逐行理解" class="menu-link depth-1" data-heading="问题改写">问题改写</a>
+<a href="./ai-qa.html#n3-问答链路中的关键设计" class="menu-link depth-1" data-heading="意图识别">意图识别</a>
+<a href="./ai-qa.html#64-多通道检索" class="menu-link depth-1" data-heading="多通道检索">多通道检索</a>
+<a href="./ai-qa.html#65-prompt-构建" class="menu-link depth-1" data-heading="Prompt构建">Prompt构建</a>
+<a href="./ai-qa.html#66-流式输出" class="menu-link depth-1" data-heading="流式输出">流式输出</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="o-项目模块介绍" data-page="modules" data-heading="项目模块介绍">
+          <span>项目模块介绍</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./modules.html#71-bootstrap" class="menu-link depth-1" data-heading="bootstrap业务入口">bootstrap业务入口</a>
+<a href="./modules.html#72-framework" class="menu-link depth-1" data-heading="framework通用能力">framework通用能力</a>
+<a href="./modules.html#73-infra-ai" class="menu-link depth-1" data-heading="infra-ai模型基础设施">infra-ai模型基础设施</a>
+<a href="./modules.html#74-mcp-server" class="menu-link depth-1" data-heading="mcp-server工具服务">mcp-server工具服务</a>
+<a href="./modules.html#75-frontend" class="menu-link depth-1" data-heading="frontend前端模块">frontend前端模块</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="p-ai-知识库建设" data-page="knowledge-base" data-heading="AI知识库建设">
+          <span>AI知识库建设</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./knowledge-base.html#p1-知识库建设主流程" class="menu-link depth-1" data-heading="知识库对象">知识库对象</a>
+<a href="./knowledge-base.html#p2-关键接口" class="menu-link depth-1" data-heading="文档上传">文档上传</a>
+<a href="./knowledge-base.html#p3-普通分块模式" class="menu-link depth-1" data-heading="文件存储">文件存储</a>
+<a href="./knowledge-base.html#p4-pipeline-模式" class="menu-link depth-1" data-heading="文档解析">文档解析</a>
+<a href="./knowledge-base.html#85-文档分块" class="menu-link depth-1" data-heading="文档分块">文档分块</a>
+<a href="./knowledge-base.html#86-向量化" class="menu-link depth-1" data-heading="向量化">向量化</a>
+<a href="./knowledge-base.html#87-异步入库" class="menu-link depth-1" data-heading="异步入库">异步入库</a>
+<a href="./knowledge-base.html#88-pipeline-入库" class="menu-link depth-1" data-heading="Pipeline入库">Pipeline入库</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="q-ollama-vllm-扫盲" data-page="ollama-vllm" data-heading="Ollama vLLM扫盲">
+          <span>Ollama vLLM扫盲</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./ollama-vllm.html#q1-ollama" class="menu-link depth-1" data-heading="Ollama是什么">Ollama是什么</a>
+<a href="./ollama-vllm.html#q2-vllm" class="menu-link depth-1" data-heading="vLLM是什么">vLLM是什么</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="r-大模型调度引擎实战" data-page="model-scheduler" data-heading="大模型调度引擎实战">
+          <span>大模型调度引擎实战</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./model-scheduler.html#r1-为什么要模型调度" class="menu-link depth-1" data-heading="AI基础设施层宏观设计">AI基础设施层宏观设计</a>
+<a href="./model-scheduler.html#r2-ragent-的模型调度类" class="menu-link depth-1" data-heading="多模型路由与智能选择">多模型路由与智能选择</a>
+<a href="./model-scheduler.html#r3-执行逻辑" class="menu-link depth-1" data-heading="三态熔断器与故障转移">三态熔断器与故障转移</a>
+<a href="./model-scheduler.html#r4-面试怎么讲" class="menu-link depth-1" data-heading="Chat同步调用与模板方法">Chat同步调用与模板方法</a>
+<a href="./model-scheduler.html#ragent-开源项目平替学习文档" class="menu-link depth-1" data-heading="SSE流式解析与异步执行">SSE流式解析与异步执行</a>
+<a href="./model-scheduler.html#ragent-开源项目平替学习文档" class="menu-link depth-1" data-heading="流式路由的首包探测机制">流式路由的首包探测机制</a>
+<a href="./model-scheduler.html#ragent-开源项目平替学习文档" class="menu-link depth-1" data-heading="Embedding向量化客户端">Embedding向量化客户端</a>
+<a href="./model-scheduler.html#ragent-开源项目平替学习文档" class="menu-link depth-1" data-heading="Rerank重排序与辅助工具">Rerank重排序与辅助工具</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="s-ai-知识问答篇" data-page="ai-qa-advanced" data-heading="AI知识问答篇">
+          <span>AI知识问答篇</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./ai-qa-advanced.html#s1-多通道检索" class="menu-link depth-1" data-heading="一次问答从前端到后端">一次问答从前端到后端</a>
+<a href="./ai-qa-advanced.html#s2-为什么要意图定向检索" class="menu-link depth-1" data-heading="为什么要意图树">为什么要意图树</a>
+<a href="./ai-qa-advanced.html#s3-空检索怎么处理" class="menu-link depth-1" data-heading="为什么要查询词映射">为什么要查询词映射</a>
+<a href="./ai-qa-advanced.html#114-为什么要-trace" class="menu-link depth-1" data-heading="为什么要Trace">为什么要Trace</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="t-面试高频考点" data-page="interview" data-heading="面试高频考点">
+          <span>面试高频考点</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./interview.html#t1-rag-和微调区别" class="menu-link depth-1" data-heading="RAG和微调有什么区别">RAG和微调有什么区别</a>
+<a href="./interview.html#t2-为什么要分块" class="menu-link depth-1" data-heading="为什么文档要分块">为什么文档要分块</a>
+<a href="./interview.html#t3-为什么要-rerank" class="menu-link depth-1" data-heading="为什么要Rerank">为什么要Rerank</a>
+<a href="./interview.html#t4-为什么要-rocketmq" class="menu-link depth-1" data-heading="为什么要多通道检索">为什么要多通道检索</a>
+<a href="./interview.html#t5-为什么要-redis" class="menu-link depth-1" data-heading="为什么要MCP">为什么要MCP</a>
+<a href="./interview.html#t6-为什么要-mcp" class="menu-link depth-1" data-heading="为什么要异步文档入库">为什么要异步文档入库</a>
+<a href="./interview.html#t7-为什么要-trace" class="menu-link depth-1" data-heading="为什么要模型路由">为什么要模型路由</a>
+<a href="./interview.html#t8-这个项目最值得讲的亮点" class="menu-link depth-1" data-heading="项目亮点怎么讲">项目亮点怎么讲</a>
+        </div>
+      </div>
+<div class="menu-group depth-0">
+        <button class="menu-toggle" type="button" data-target="13-常见启动错误速查" data-page="faq" data-heading="常见启动错误速查">
+          <span>常见启动错误速查</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="menu-children">
+          <a href="./faq.html#131-docker-api-连接失败" class="menu-link depth-1" data-heading="Docker API 连接失败">Docker API 连接失败</a>
+<a href="./faq.html#132-后端连不上-redis" class="menu-link depth-1" data-heading="后端连不上 Redis">后端连不上 Redis</a>
+<a href="./faq.html#133-后端数据库密码错误" class="menu-link depth-1" data-heading="后端数据库密码错误">后端数据库密码错误</a>
+<a href="./faq.html#134-rocketmq-dashboard-打不开" class="menu-link depth-1" data-heading="RocketMQ Dashboard 打不开">RocketMQ Dashboard 打不开</a>
+<a href="./faq.html#135-前端-5173-端口冲突" class="menu-link depth-1" data-heading="前端 5173 端口冲突">前端 5173 端口冲突</a>
+        </div>
+      </div>
+<a href="./study-path.html#14-推荐学习路线" class="menu-link depth-0" data-heading="推荐学习路线">推荐学习路线</a>
+<a href="./summary.html#15-一句话总结" class="menu-link depth-0" data-heading="一句话总结">一句话总结</a>
+<div class="menu-muted depth-0">内容正在持续更新中...</div>
+      </nav>
+    </aside>
+    <main class="content">
+      <article class="doc" id="doc">
+        <h2 id="d-rag-基础概念">RAG 基础概念<a class="heading-anchor" href="#d-rag-基础概念" aria-label="Link to RAG 基础概念">#</a></h2>
+
+<h3 id="d1-什么是-rag-技术">什么是 RAG 技术？<a class="heading-anchor" href="#d1-什么是-rag-技术" aria-label="Link to 什么是 RAG 技术？">#</a></h3>
+<p>RAG 是 Retrieval-Augmented Generation，中文通常叫“检索增强生成”。</p>
+<p>你可以用一个生活例子理解：</p>
+<pre><code class="language-text">普通大模型回答 = 闭卷考试
+RAG 回答 = 先查资料，再开卷答题</code></pre>
+<p>大模型本身不知道你公司的内部制度、产品说明、业务数据。RAG 的核心就是在回答前先检索你的私有知识库，然后把检索结果作为上下文给模型。</p>
+<p>完整链路：</p>
+<pre><code class="language-text">离线阶段：文档 -&gt; 解析 -&gt; 分块 -&gt; Embedding -&gt; 向量库
+在线阶段：问题 -&gt; 改写 -&gt; Embedding/意图识别 -&gt; 检索 -&gt; Prompt -&gt; LLM -&gt; 答案</code></pre>
+<p>Ragent 里的在线问答主线：</p>
+<pre><code class="language-text">RAGChatController
+  -&gt; RAGChatServiceImpl
+  -&gt; StreamChatPipeline
+  -&gt; ConversationMemoryService
+  -&gt; QueryRewriteService
+  -&gt; IntentResolver
+  -&gt; RetrievalEngine
+  -&gt; RAGPromptService
+  -&gt; LLMService</code></pre>
+
+<h3 id="d2-rag-解决了什么问题">RAG 解决了什么问题<a class="heading-anchor" href="#d2-rag-解决了什么问题" aria-label="Link to RAG 解决了什么问题">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>问题</th>
+<th>没有 RAG</th>
+<th>有 RAG</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>私有知识</td>
+<td>模型不知道公司内部资料</td>
+<td>从知识库检索后回答</td>
+</tr>
+<tr>
+<td>知识更新</td>
+<td>需要重新训练或等模型更新</td>
+<td>更新文档和向量即可</td>
+</tr>
+<tr>
+<td>幻觉</td>
+<td>模型容易编</td>
+<td>要求基于检索上下文回答</td>
+</tr>
+<tr>
+<td>可解释性</td>
+<td>不知道答案依据</td>
+<td>可以展示命中的文档片段</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>长文档全塞 Prompt 很贵</td>
+<td>只取相关 chunk</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="d3-rag-不等于简单向量检索">RAG 不等于简单向量检索<a class="heading-anchor" href="#d3-rag-不等于简单向量检索" aria-label="Link to RAG 不等于简单向量检索">#</a></h3>
+<p>很多人以为：</p>
+<pre><code class="language-text">RAG = Embedding + 向量数据库 + 大模型</code></pre>
+<p>这只是最小 Demo。真实工程至少还要考虑：</p>
+<ul>
+<li>文档解析质量。</li>
+<li>Chunk 粒度。</li>
+<li>元数据过滤。</li>
+<li>查询改写。</li>
+<li>多轮上下文。</li>
+<li>多通道召回。</li>
+<li>Rerank。</li>
+<li>Prompt 结构。</li>
+<li>流式响应。</li>
+<li>调用失败降级。</li>
+<li>Trace 和评估。</li>
+</ul>
+<p>Ragent 的代码基本覆盖了这些点，所以它适合拿来学工程化 RAG。</p>
+<p>---</p>
+
+<h2 id="e-rag-基础概念---基础篇">RAG 基础概念 - 基础篇<a class="heading-anchor" href="#e-rag-基础概念---基础篇" aria-label="Link to RAG 基础概念 - 基础篇">#</a></h2>
+
+<h3 id="e1-什么是大模型">什么是大模型<a class="heading-anchor" href="#e1-什么是大模型" aria-label="Link to 什么是大模型">#</a></h3>
+<p>大模型可以理解成一个“根据上下文预测下一个 token 的语言模型”。它并不是数据库，也不是搜索引擎。它擅长：</p>
+<ul>
+<li>理解自然语言。</li>
+<li>总结文本。</li>
+<li>改写问题。</li>
+<li>生成答案。</li>
+<li>提取结构化信息。</li>
+<li>根据工具返回结果组织表达。</li>
+</ul>
+<p>它不擅长：</p>
+<ul>
+<li>保证事实永远正确。</li>
+<li>记住你的私有文档。</li>
+<li>实时查询业务系统。</li>
+<li>处理超出上下文长度的大量资料。</li>
+</ul>
+<p>所以 RAG 的工程设计，本质是在弥补大模型的这些短板。</p>
+
+<h3 id="e2-ragent-中大模型承担哪些任务">Ragent 中大模型承担哪些任务<a class="heading-anchor" href="#e2-ragent-中大模型承担哪些任务" aria-label="Link to Ragent 中大模型承担哪些任务">#</a></h3>
+<p>在 Ragent 里，大模型不只是最后回答问题，还参与多个中间环节：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>场景</th>
+<th>作用</th>
+<th>相关类</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>问题改写</td>
+<td>把口语化、依赖上下文的问题改成完整问题</td>
+<td><code>QueryRewriteService</code></td>
+</tr>
+<tr>
+<td>多问题拆分</td>
+<td>一个复杂问题拆成多个子问题</td>
+<td><code>MultiQuestionRewriteService</code></td>
+</tr>
+<tr>
+<td>意图识别</td>
+<td>判断问题属于哪个业务意图</td>
+<td><code>DefaultIntentClassifier</code></td>
+</tr>
+<tr>
+<td>参数抽取</td>
+<td>从用户问题中提取 MCP 工具参数</td>
+<td><code>LLMMCPParameterExtractor</code></td>
+</tr>
+<tr>
+<td>最终回答</td>
+<td>基于知识库和工具结果生成答案</td>
+<td><code>LLMService</code></td>
+</tr>
+<tr>
+<td>摘要记忆</td>
+<td>压缩长对话历史</td>
+<td><code>ConversationMemorySummaryService</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>这说明大模型在 RAG 系统里通常是“多个小任务的执行器”，不是只在最后生成答案。</p>
+
+<h3 id="e3-如何调用大模型">如何调用大模型<a class="heading-anchor" href="#e3-如何调用大模型" aria-label="Link to 如何调用大模型">#</a></h3>
+<p>Ragent 没有在业务代码里直接写 HTTP 调模型，而是放在 <code>infra-ai</code> 模块。</p>
+<p>核心接口：</p>
+<pre><code class="language-text">ChatClient
+EmbeddingClient
+RerankClient</code></pre>
+<p>供应商实现：</p>
+<pre><code class="language-text">BaiLianChatClient
+SiliconFlowChatClient
+OllamaChatClient
+SiliconFlowEmbeddingClient
+OllamaEmbeddingClient
+BaiLianRerankClient
+NoopRerankClient</code></pre>
+<p>为什么这样设计：</p>
+<ul>
+<li>业务代码不用关心百炼、SiliconFlow、Ollama 的接口差异。</li>
+<li>后续新增模型供应商，只需要新增客户端实现和配置。</li>
+<li>模型调用失败时，可以统一走路由降级。</li>
+</ul>
+
+<h3 id="e4-如何写好-prompt-工程">如何写好 Prompt 工程<a class="heading-anchor" href="#e4-如何写好-prompt-工程" aria-label="Link to 如何写好 Prompt 工程">#</a></h3>
+<p>Prompt 不是随便拼一句“请回答用户问题”。在 RAG 中，Prompt 至少要包含：</p>
+<ul>
+<li>角色要求：你是什么助手。</li>
+<li>回答边界：只能根据上下文回答，不知道就说不知道。</li>
+<li>用户问题：当前问题。</li>
+<li>检索上下文：命中的知识片段。</li>
+<li>MCP 结果：工具返回的数据。</li>
+<li>历史上下文：多轮对话记忆。</li>
+<li>输出格式：是否需要列表、表格、步骤。</li>
+</ul>
+<p>Ragent 的 Prompt 构建主要在：</p>
+<pre><code class="language-text">RAGPromptService
+PromptContext
+DefaultContextFormatter
+PromptTemplateLoader</code></pre>
+<p>学习时可以重点观察：</p>
+<ul>
+<li><code>StreamChatPipeline.streamLLMResponse</code> 如何构造 <code>PromptContext</code>。</li>
+<li><code>RAGPromptService</code> 如何把知识库上下文、MCP 上下文和历史消息组合成 messages。</li>
+<li>不同场景下 temperature、topP 如何设置。</li>
+</ul>
+<p>例如代码里 MCP 场景会稍微放宽温度：</p>
+<pre><code class="language-text">ctx.hasMcp() ? 0.3D : 0D</code></pre>
+<p>这表示：纯知识库回答更追求稳定，工具调用场景需要一点自然表达空间。</p>
+
+<h3 id="e5-prompt-工程常见错误">Prompt 工程常见错误<a class="heading-anchor" href="#e5-prompt-工程常见错误" aria-label="Link to Prompt 工程常见错误">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>错误</th>
+<th>后果</th>
+<th>改法</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>把所有文档都塞给模型</td>
+<td>成本高、噪音大、超上下文</td>
+<td>先检索，只放相关 chunk</td>
+</tr>
+<tr>
+<td>没有限制回答依据</td>
+<td>模型容易自由发挥</td>
+<td>明确要求基于上下文</td>
+</tr>
+<tr>
+<td>上下文没标来源</td>
+<td>不便解释和排障</td>
+<td>保留 docId、chunkId、标题</td>
+</tr>
+<tr>
+<td>历史对话无限追加</td>
+<td>token 越来越多</td>
+<td>保留近几轮，旧历史摘要</td>
+</tr>
+<tr>
+<td>Prompt 太复杂</td>
+<td>模型遵循困难</td>
+<td>分任务、多阶段处理</td>
+</tr>
+</tbody>
+</table></div>
+<p>---</p>
+
+<h2 id="f-rag-基础概念---数据篇">RAG 基础概念 - 数据篇<a class="heading-anchor" href="#f-rag-基础概念---数据篇" aria-label="Link to RAG 基础概念 - 数据篇">#</a></h2>
+
+<h3 id="f1-用-apache-tika-解析文档">用 Apache Tika 解析文档<a class="heading-anchor" href="#f1-用-apache-tika-解析文档" aria-label="Link to 用 Apache Tika 解析文档">#</a></h3>
+<p>企业文档格式很杂：</p>
+<ul>
+<li>PDF。</li>
+<li>Word。</li>
+<li>Excel。</li>
+<li>PPT。</li>
+<li>Markdown。</li>
+<li>TXT。</li>
+<li>网页内容。</li>
+</ul>
+<p>大模型和向量数据库不能直接理解这些文件格式，所以第一步是“解析成文本”。</p>
+<p>Ragent 的解析器结构：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>DocumentParser</code></td>
+<td>文档解析接口</td>
+</tr>
+<tr>
+<td><code>DocumentParserSelector</code></td>
+<td>根据类型选择解析器</td>
+</tr>
+<tr>
+<td><code>TikaDocumentParser</code></td>
+<td>使用 Apache Tika 解析常见文档</td>
+</tr>
+<tr>
+<td><code>MarkdownDocumentParser</code></td>
+<td>解析 Markdown</td>
+</tr>
+<tr>
+<td><code>ParseResult</code></td>
+<td>解析结果</td>
+</tr>
+<tr>
+<td><code>TextCleanupUtil</code></td>
+<td>文本清洗</td>
+</tr>
+</tbody>
+</table></div>
+<p>代码路径：</p>
+<pre><code class="language-text">bootstrap/src/main/java/com/nageoffer/ai/ragent/core/parser</code></pre>
+
+<h3 id="f2-为什么需要-tika">为什么需要 Tika<a class="heading-anchor" href="#f2-为什么需要-tika" aria-label="Link to 为什么需要 Tika">#</a></h3>
+<p>如果你自己解析 PDF、Word，会遇到很多坑：</p>
+<ul>
+<li>PDF 可能是扫描件。</li>
+<li>Word 有标题、表格、页眉页脚。</li>
+<li>PPT 文本分散在不同元素里。</li>
+<li>Excel 有多个 sheet。</li>
+<li>文件编码不统一。</li>
+</ul>
+<p>Apache Tika 的价值是屏蔽大部分文件格式差异，把多种文档转成统一文本。</p>
+
+<h3 id="f3-ragent-文档解析流程">Ragent 文档解析流程<a class="heading-anchor" href="#f3-ragent-文档解析流程" aria-label="Link to Ragent 文档解析流程">#</a></h3>
+<p>普通分块模式里，核心逻辑在 <code>KnowledgeDocumentServiceImpl.runChunkProcess</code>：</p>
+<pre><code class="language-text">fileStorageService.openStream(documentDO.getFileUrl())
+  -&gt; parserSelector.select(ParserType.TIKA.getType()).extractText(...)
+  -&gt; chunkingStrategy.chunk(...)
+  -&gt; chunkEmbeddingService.embed(...)
+  -&gt; persistChunksAndVectorsAtomically(...)</code></pre>
+<p>按人话说：</p>
+<ul>
+<li>从 RustFS 打开原始文件流。</li>
+<li>用 Tika 抽取文本。</li>
+<li>按分块策略切成 chunks。</li>
+<li>调 Embedding 模型。</li>
+<li>同时写业务分块表和向量表。</li>
+</ul>
+
+<h3 id="f4-数据分块-chunk-策略与实践">数据分块 Chunk 策略与实践<a class="heading-anchor" href="#f4-数据分块-chunk-策略与实践" aria-label="Link to 数据分块 Chunk 策略与实践">#</a></h3>
+<p>为什么要分块？</p>
+<p>因为整篇文档太大，直接向量化会让语义变粗。比如一篇 20 页制度文档，里面既有请假，又有报销，又有考勤。如果整篇作为一个向量，用户问“年假怎么申请”，检索结果就不够精准。</p>
+<p>但分块也不能太小。如果每 20 个字切一块，模型拿到的是碎片，无法理解上下文。</p>
+<p>所以分块要平衡：</p>
+<pre><code class="language-text">粒度太大 -&gt; 召回不精准
+粒度太小 -&gt; 上下文不完整</code></pre>
+<p>Ragent 中的分块接口：</p>
+<pre><code class="language-text">ChunkingStrategy</code></pre>
+<p>已实现策略：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>策略</th>
+<th>类</th>
+<th>适用场景</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>固定长度分块</td>
+<td><code>FixedSizeTextChunker</code></td>
+<td>文本结构不明显、先快速跑通</td>
+</tr>
+<tr>
+<td>结构感知分块</td>
+<td><code>StructureAwareTextChunker</code></td>
+<td>Markdown、制度文档、标题层级明显的材料</td>
+</tr>
+</tbody>
+</table></div>
+<p>代码路径：</p>
+<pre><code class="language-text">bootstrap/src/main/java/com/nageoffer/ai/ragent/core/chunk</code></pre>
+
+<h3 id="f5-分块时要保存哪些信息">分块时要保存哪些信息<a class="heading-anchor" href="#f5-分块时要保存哪些信息" aria-label="Link to 分块时要保存哪些信息">#</a></h3>
+<p>一个 chunk 不应该只有 content，还应该有元数据。</p>
+<p>常见元数据：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>元数据</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>kbId</code></td>
+<td>属于哪个知识库</td>
+</tr>
+<tr>
+<td><code>docId</code></td>
+<td>属于哪个文档</td>
+</tr>
+<tr>
+<td><code>chunkId</code></td>
+<td>片段唯一 ID</td>
+</tr>
+<tr>
+<td><code>chunkIndex</code></td>
+<td>在文档里的顺序</td>
+</tr>
+<tr>
+<td><code>contentHash</code></td>
+<td>判断内容是否重复</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>是否参与检索</td>
+</tr>
+<tr>
+<td><code>fileType</code></td>
+<td>文件类型</td>
+</tr>
+<tr>
+<td><code>docName</code></td>
+<td>文档名称</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ragent 的 chunk 表：</p>
+<pre><code class="language-text">t_knowledge_chunk</code></pre>
+<p>向量表：</p>
+<pre><code class="language-text">t_knowledge_vector</code></pre>
+
+<h3 id="f6-元数据的作用与管理">元数据的作用与管理<a class="heading-anchor" href="#f6-元数据的作用与管理" aria-label="Link to 元数据的作用与管理">#</a></h3>
+<p>元数据在 RAG 中非常重要。它不是“附属信息”，而是检索过滤和结果解释的基础。</p>
+<p>典型作用：</p>
+<ul>
+<li>权限过滤：用户只能检索自己有权限的知识库。</li>
+<li>范围限定：只在某个知识库或某类文档里查。</li>
+<li>答案溯源：告诉用户答案来自哪个文档。</li>
+<li>增量更新：删除某个文档时，只删除它的向量。</li>
+<li>检索调优：按文档类型、业务域、时间等做过滤。</li>
+</ul>
+<p>Ragent 在删除文档时会同时删除向量：</p>
+<pre><code class="language-text">vectorStoreService.deleteDocumentVectors(collectionName, docId)</code></pre>
+<p>这就是元数据中 <code>docId</code> 的价值。</p>
+
+<h3 id="f7-数据篇实践任务">数据篇实践任务<a class="heading-anchor" href="#f7-数据篇实践任务" aria-label="Link to 数据篇实践任务">#</a></h3>
+<p>你可以用下面的方式练习：</p>
+<ul>
+<li>启动项目并登录后台。</li>
+<li>创建一个知识库。</li>
+<li>上传一份 Markdown 或 PDF。</li>
+<li>点击开始分块。</li>
+<li>查看 <code>t_knowledge_document</code> 状态变化。</li>
+<li>查看 <code>t_knowledge_chunk</code> 是否生成分块。</li>
+<li>查看 <code>t_knowledge_vector</code> 是否生成向量。</li>
+<li>去 Trace 页面观察问答是否命中文档片段。</li>
+</ul>
+<p>常用 SQL：</p>
+<pre><code class="language-sql">select id, name, collection_name from t_knowledge_base;
+select id, doc_name, status, chunk_count from t_knowledge_document;
+select doc_id, chunk_index, left(content, 80) from t_knowledge_chunk limit 10;
+select collection_name, doc_id, chunk_id from t_knowledge_vector limit 10;</code></pre>
+<p>---</p>
+
+<h2 id="g-rag-基础概念---向量篇">RAG 基础概念 - 向量篇<a class="heading-anchor" href="#g-rag-基础概念---向量篇" aria-label="Link to RAG 基础概念 - 向量篇">#</a></h2>
+
+<h3 id="g1-从文本到向量理解-embedding">从文本到向量：理解 Embedding<a class="heading-anchor" href="#g1-从文本到向量理解-embedding" aria-label="Link to 从文本到向量：理解 Embedding">#</a></h3>
+<p>Embedding 是把文本转换成一串数字。</p>
+<p>例如：</p>
+<pre><code class="language-text">&quot;请假流程&quot; -&gt; [0.12, -0.04, 0.88, ...]
+&quot;年假怎么申请&quot; -&gt; [0.10, -0.02, 0.83, ...]</code></pre>
+<p>如果两句话语义接近，它们的向量距离也接近。</p>
+<p>所以向量检索不是按字面匹配，而是按语义相似度匹配。</p>
+
+<h3 id="g2-为什么不用普通-sql-like">为什么不用普通 SQL like<a class="heading-anchor" href="#g2-为什么不用普通-sql-like" aria-label="Link to 为什么不用普通 SQL like">#</a></h3>
+<p>普通 SQL：</p>
+<pre><code class="language-sql">where content like '%请假%'</code></pre>
+<p>只能匹配“请假”这个词。如果用户问：</p>
+<pre><code class="language-text">年休假怎么提？</code></pre>
+<p>文档写的是：</p>
+<pre><code class="language-text">员工年假申请流程如下</code></pre>
+<p>关键词可能匹配不好。Embedding 可以把“年休假”“年假”“休假申请”映射到相近语义空间。</p>
+
+<h3 id="g3-ragent-如何生成-embedding">Ragent 如何生成 Embedding<a class="heading-anchor" href="#g3-ragent-如何生成-embedding" aria-label="Link to Ragent 如何生成 Embedding">#</a></h3>
+<p>核心类：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>ChunkEmbeddingService</code></td>
+<td>给 chunk 批量补充向量</td>
+</tr>
+<tr>
+<td><code>EmbeddingService</code></td>
+<td>Embedding 服务接口</td>
+</tr>
+<tr>
+<td><code>RoutingEmbeddingService</code></td>
+<td>带路由能力的 Embedding 服务</td>
+</tr>
+<tr>
+<td><code>SiliconFlowEmbeddingClient</code></td>
+<td>SiliconFlow Embedding 客户端</td>
+</tr>
+<tr>
+<td><code>OllamaEmbeddingClient</code></td>
+<td>Ollama Embedding 客户端</td>
+</tr>
+</tbody>
+</table></div>
+<p>配置：</p>
+<pre><code class="language-yaml">ai:
+  embedding:
+    default-model: qwen-emb-8b
+    candidates:
+      - id: qwen-emb-8b
+        provider: siliconflow
+        model: Qwen/Qwen3-Embedding-8B
+        dimension: ${rag.default.dimension}</code></pre>
+<p>默认维度：</p>
+<pre><code class="language-yaml">rag:
+  default:
+    dimension: 1536</code></pre>
+<p>维度必须一致。模型输出 1536 维，数据库 vector 字段也要按 1536 维设计。</p>
+
+<h3 id="g4-向量数据库的原理与选型">向量数据库的原理与选型<a class="heading-anchor" href="#g4-向量数据库的原理与选型" aria-label="Link to 向量数据库的原理与选型">#</a></h3>
+<p>向量数据库解决的是：</p>
+<pre><code class="language-text">给我一个查询向量，请快速找出最相似的 N 个向量。</code></pre>
+<p>常见相似度：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>指标</th>
+<th>含义</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Cosine</td>
+<td>余弦相似度，关注方向</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>欧氏距离，关注空间距离</td>
+</tr>
+<tr>
+<td>Dot Product</td>
+<td>点积，常用于归一化向量</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ragent 配置：</p>
+<pre><code class="language-yaml">rag:
+  default:
+    metric-type: COSINE</code></pre>
+
+<h3 id="g5-pgvector-与-milvus-怎么选">pgvector 与 Milvus 怎么选<a class="heading-anchor" href="#g5-pgvector-与-milvus-怎么选" aria-label="Link to pgvector 与 Milvus 怎么选">#</a></h3>
+<p>Ragent 同时保留了 pgvector 和 Milvus 实现。</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+<th>适用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>PostgreSQL + pgvector</td>
+<td>部署简单，业务数据和向量数据在一个库里</td>
+<td>大规模向量检索能力不如专业向量库</td>
+<td>学习、原型、中小规模</td>
+</tr>
+<tr>
+<td>Milvus</td>
+<td>专业向量数据库，适合大规模向量检索</td>
+<td>部署复杂，需要额外运维</td>
+<td>大规模生产场景</td>
+</tr>
+</tbody>
+</table></div>
+<p>当前项目默认：</p>
+<pre><code class="language-yaml">rag:
+  vector:
+    type: pg</code></pre>
+<p>所以首次学习建议先用 pgvector，不要一开始就部署 Milvus。</p>
+
+<h3 id="g6-ragent-向量检索实现">Ragent 向量检索实现<a class="heading-anchor" href="#g6-ragent-向量检索实现" aria-label="Link to Ragent 向量检索实现">#</a></h3>
+<p>相关类：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>VectorStoreService</code></td>
+<td>向量写入、删除抽象</td>
+</tr>
+<tr>
+<td><code>PgVectorStoreService</code></td>
+<td>PostgreSQL 向量写入</td>
+</tr>
+<tr>
+<td><code>MilvusVectorStoreService</code></td>
+<td>Milvus 向量写入</td>
+</tr>
+<tr>
+<td><code>RetrieverService</code></td>
+<td>检索抽象</td>
+</tr>
+<tr>
+<td><code>PgRetrieverService</code></td>
+<td>PostgreSQL 检索</td>
+</tr>
+<tr>
+<td><code>MilvusRetrieverService</code></td>
+<td>Milvus 检索</td>
+</tr>
+</tbody>
+</table></div>
+<p>数据库脚本里有 HNSW 索引：</p>
+<pre><code class="language-sql">CREATE INDEX idx_kv_embedding ON t_knowledge_vector USING hnsw (embedding vector_cosine_ops);</code></pre>
+<p>HNSW 是常见近似最近邻索引，适合快速找相似向量。</p>
+
+<h3 id="g7-向量篇实践任务">向量篇实践任务<a class="heading-anchor" href="#g7-向量篇实践任务" aria-label="Link to 向量篇实践任务">#</a></h3>
+<ul>
+<li>上传一份文档并分块。</li>
+<li>查 <code>t_knowledge_vector</code> 是否有数据。</li>
+<li>修改一个 chunk 内容并重新入库。</li>
+<li>观察旧向量是否被删除、新向量是否写入。</li>
+<li>调整 <code>topK</code> 或检索阈值，观察回答差异。</li>
+</ul>
+<p>---</p>
+
+<h2 id="h-rag-基础概念---应用篇">RAG 基础概念 - 应用篇<a class="heading-anchor" href="#h-rag-基础概念---应用篇" aria-label="Link to RAG 基础概念 - 应用篇">#</a></h2>
+
+<h3 id="h1-rag-应用不是只有聊天框">RAG 应用不是只有聊天框<a class="heading-anchor" href="#h1-rag-应用不是只有聊天框" aria-label="Link to RAG 应用不是只有聊天框">#</a></h3>
+<p>一个能上线的 RAG 应用至少需要：</p>
+<ul>
+<li>用户系统。</li>
+<li>知识库后台。</li>
+<li>文档管理。</li>
+<li>分块管理。</li>
+<li>意图管理。</li>
+<li>示例问题管理。</li>
+<li>系统设置。</li>
+<li>Trace 排障。</li>
+<li>模型配置。</li>
+</ul>
+<p>Ragent 前端页面基本覆盖这些功能：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>功能</th>
+<th>前端路径</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>聊天页</td>
+<td><code>frontend/src/pages/ChatPage.tsx</code></td>
+</tr>
+<tr>
+<td>登录页</td>
+<td><code>frontend/src/pages/LoginPage.tsx</code></td>
+</tr>
+<tr>
+<td>管理后台</td>
+<td><code>frontend/src/pages/admin/AdminLayout.tsx</code></td>
+</tr>
+<tr>
+<td>仪表盘</td>
+<td><code>frontend/src/pages/admin/dashboard/DashboardPage.tsx</code></td>
+</tr>
+<tr>
+<td>知识库</td>
+<td><code>frontend/src/pages/admin/knowledge</code></td>
+</tr>
+<tr>
+<td>意图树</td>
+<td><code>frontend/src/pages/admin/intent-tree</code></td>
+</tr>
+<tr>
+<td>入库流水线</td>
+<td><code>frontend/src/pages/admin/ingestion/IngestionPage.tsx</code></td>
+</tr>
+<tr>
+<td>Trace</td>
+<td><code>frontend/src/pages/admin/traces</code></td>
+</tr>
+<tr>
+<td>用户管理</td>
+<td><code>frontend/src/pages/admin/users/UserListPage.tsx</code></td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="h2-前端如何调用后端">前端如何调用后端<a class="heading-anchor" href="#h2-前端如何调用后端" aria-label="Link to 前端如何调用后端">#</a></h3>
+<p>前端统一 API 封装在：</p>
+<pre><code class="language-text">frontend/src/services</code></pre>
+<p>基础请求配置：</p>
+<pre><code class="language-text">frontend/src/services/api.ts</code></pre>
+<p>开发环境代理：</p>
+<pre><code class="language-ts">server: {
+  port: 5174,
+  proxy: {
+    &quot;/api&quot;: {
+      target: &quot;http://localhost:9090&quot;
+    }
+  }
+}</code></pre>
+<p>所以前端请求 <code>/api/ragent/auth/login</code> 时，Vite 会代理到后端 <code>9090</code>。</p>
+
+<h3 id="h3-应用层最重要的接口">应用层最重要的接口<a class="heading-anchor" href="#h3-应用层最重要的接口" aria-label="Link to 应用层最重要的接口">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>功能</th>
+<th>接口</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>登录</td>
+<td><code>POST /api/ragent/auth/login</code></td>
+</tr>
+<tr>
+<td>当前用户</td>
+<td><code>GET /api/ragent/user/me</code></td>
+</tr>
+<tr>
+<td>流式问答</td>
+<td><code>GET /api/ragent/rag/v3/chat</code></td>
+</tr>
+<tr>
+<td>停止生成</td>
+<td><code>POST /api/ragent/rag/v3/stop</code></td>
+</tr>
+<tr>
+<td>知识库列表</td>
+<td><code>GET /api/ragent/knowledge-base</code></td>
+</tr>
+<tr>
+<td>上传文档</td>
+<td><code>POST /api/ragent/knowledge-base/{kb-id}/docs/upload</code></td>
+</tr>
+<tr>
+<td>开始分块</td>
+<td><code>POST /api/ragent/knowledge-base/docs/{doc-id}/chunk</code></td>
+</tr>
+<tr>
+<td>Trace 列表</td>
+<td><code>GET /api/ragent/rag/traces/runs</code></td>
+</tr>
+<tr>
+<td>MCP 工具服务</td>
+<td><code>POST http://localhost:9099/mcp</code></td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="h4-应用篇实践任务">应用篇实践任务<a class="heading-anchor" href="#h4-应用篇实践任务" aria-label="Link to 应用篇实践任务">#</a></h3>
+<ul>
+<li>打开前端登录页。</li>
+<li>使用 <code>admin/admin</code> 登录。</li>
+<li>创建知识库。</li>
+<li>上传文档。</li>
+<li>开始分块。</li>
+<li>在聊天页提问。</li>
+<li>去 Trace 页面查看链路。</li>
+<li>修改意图树，再次提问，观察检索变化。</li>
+</ul>
+<p>---</p>
+
+<h2 id="i-rag-基础概念---mcp-篇">RAG 基础概念 - MCP 篇<a class="heading-anchor" href="#i-rag-基础概念---mcp-篇" aria-label="Link to RAG 基础概念 - MCP 篇">#</a></h2>
+
+<h3 id="i1-mcp-是什么">MCP 是什么<a class="heading-anchor" href="#i1-mcp-是什么" aria-label="Link to MCP 是什么">#</a></h3>
+<p>MCP 可以理解成大模型调用外部工具的一套标准协议。</p>
+<p>RAG 适合回答文档知识，但有些问题不该从知识库里找：</p>
+<pre><code class="language-text">今天上海天气怎么样？
+帮我查一下订单销量。
+查询某车次余票。</code></pre>
+<p>这些问题需要实时调用业务系统。MCP 就是让模型能“看见并调用工具”。</p>
+
+<h3 id="i2-ragent-中-mcp-的结构">Ragent 中 MCP 的结构<a class="heading-anchor" href="#i2-ragent-中-mcp-的结构" aria-label="Link to Ragent 中 MCP 的结构">#</a></h3>
+<p>Ragent 有两个角色：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>角色</th>
+<th>模块</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>MCP Client</td>
+<td><code>bootstrap</code></td>
+<td>主问答服务，发现工具并调用工具</td>
+</tr>
+<tr>
+<td>MCP Server</td>
+<td><code>mcp-server</code></td>
+<td>提供工具列表和工具调用接口</td>
+</tr>
+</tbody>
+</table></div>
+<p>MCP Server 入口：</p>
+<pre><code class="language-text">mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp/endpoint/MCPEndpoint.java</code></pre>
+<p>分发器：</p>
+<pre><code class="language-text">MCPDispatcher</code></pre>
+<p>支持方法：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>JSON-RPC 方法</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>initialize</code></td>
+<td>初始化</td>
+</tr>
+<tr>
+<td><code>tools/list</code></td>
+<td>返回工具列表</td>
+</tr>
+<tr>
+<td><code>tools/call</code></td>
+<td>调用工具</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="i3-示例工具">示例工具<a class="heading-anchor" href="#i3-示例工具" aria-label="Link to 示例工具">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>工具</th>
+<th>类</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>weather_query</code></td>
+<td><code>WeatherMCPExecutor</code></td>
+<td>天气查询</td>
+</tr>
+<tr>
+<td><code>ticket_query</code></td>
+<td><code>TicketMCPExecutor</code></td>
+<td>票务查询</td>
+</tr>
+<tr>
+<td><code>sales_query</code></td>
+<td><code>SalesMCPExecutor</code></td>
+<td>销售查询</td>
+</tr>
+</tbody>
+</table></div>
+<p>主服务启动时会连接：</p>
+<pre><code class="language-yaml">rag:
+  mcp:
+    servers:
+      - name: default
+        url: http://localhost:9099</code></pre>
+<p>启动日志里如果看到：</p>
+<pre><code class="language-text">MCP Server [default] 返回 3 个工具</code></pre>
+<p>说明工具注册成功。</p>
+
+<h3 id="i4-mcp-调用流程">MCP 调用流程<a class="heading-anchor" href="#i4-mcp-调用流程" aria-label="Link to MCP 调用流程">#</a></h3>
+<pre><code class="language-text">用户问题
+  -&gt; 意图识别发现这是工具型问题
+  -&gt; LLM 提取工具参数
+  -&gt; RemoteMCPToolExecutor 调用 MCP Server
+  -&gt; MCP Server 执行工具
+  -&gt; 工具结果返回主服务
+  -&gt; 主服务把工具结果拼进 Prompt
+  -&gt; LLM 组织自然语言答案</code></pre>
+<p>核心类：</p>
+<ul>
+<li><code>LLMMCPParameterExtractor</code></li>
+<li><code>DefaultMCPToolRegistry</code></li>
+<li><code>RemoteMCPToolExecutor</code></li>
+<li><code>HttpMCPClient</code></li>
+<li><code>MCPClientAutoConfiguration</code></li>
+</ul>
+<p>---</p>
+
+<h2 id="j-rag-基础概念---对话增强篇">RAG 基础概念 - 对话增强篇<a class="heading-anchor" href="#j-rag-基础概念---对话增强篇" aria-label="Link to RAG 基础概念 - 对话增强篇">#</a></h2>
+
+<h3 id="j1-为什么需要对话增强">为什么需要对话增强<a class="heading-anchor" href="#j1-为什么需要对话增强" aria-label="Link to 为什么需要对话增强">#</a></h3>
+<p>真实用户不会每次都问完整问题。</p>
+<p>第一轮：</p>
+<pre><code class="language-text">公司年假怎么申请？</code></pre>
+<p>第二轮：</p>
+<pre><code class="language-text">那需要提前几天？</code></pre>
+<p>第二轮里的“那”依赖第一轮。如果不加载会话历史，系统不知道用户在问年假。</p>
+
+<h3 id="j2-ragent-的会话记忆">Ragent 的会话记忆<a class="heading-anchor" href="#j2-ragent-的会话记忆" aria-label="Link to Ragent 的会话记忆">#</a></h3>
+<p>核心类：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>作用</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>ConversationMemoryService</code></td>
+<td>会话记忆接口</td>
+</tr>
+<tr>
+<td><code>DefaultConversationMemoryService</code></td>
+<td>默认实现</td>
+</tr>
+<tr>
+<td><code>JdbcConversationMemoryStore</code></td>
+<td>从数据库读取和保存消息</td>
+</tr>
+<tr>
+<td><code>ConversationMemorySummaryService</code></td>
+<td>会话摘要</td>
+</tr>
+</tbody>
+</table></div>
+<p>配置：</p>
+<pre><code class="language-yaml">rag:
+  memory:
+    history-keep-turns: 4
+    summary-start-turns: 5
+    summary-enabled: true
+    summary-max-chars: 200</code></pre>
+<p>意思是：</p>
+<ul>
+<li>近期 4 轮直接保留。</li>
+<li>长对话开始摘要。</li>
+<li>摘要控制长度，减少 token。</li>
+</ul>
+
+<h3 id="j3-问题改写与拆分">问题改写与拆分<a class="heading-anchor" href="#j3-问题改写与拆分" aria-label="Link to 问题改写与拆分">#</a></h3>
+<p>核心类：</p>
+<pre><code class="language-text">QueryRewriteService
+MultiQuestionRewriteService
+RewriteResult</code></pre>
+<p>例子：</p>
+<p>用户问：</p>
+<pre><code class="language-text">报销和请假分别怎么走？</code></pre>
+<p>系统可以拆成：</p>
+<pre><code class="language-text">1. 报销流程是什么？
+2. 请假流程是什么？</code></pre>
+<p>这样每个子问题可以单独识别意图和检索，提高召回率。</p>
+
+<h3 id="j4-模糊意图澄清">模糊意图澄清<a class="heading-anchor" href="#j4-模糊意图澄清" aria-label="Link to 模糊意图澄清">#</a></h3>
+<p>如果用户问：</p>
+<pre><code class="language-text">怎么申请？</code></pre>
+<p>系统可能无法判断是申请年假、报销、账号权限，直接回答容易错。</p>
+<p>Ragent 里有：</p>
+<pre><code class="language-text">IntentGuidanceService
+GuidanceDecision</code></pre>
+<p>它会判断是否需要引导用户补充信息。</p>
+<p>---</p>
+
+<h2 id="k-rag-基础概念---数据传输协议">RAG 基础概念 - 数据传输协议<a class="heading-anchor" href="#k-rag-基础概念---数据传输协议" aria-label="Link to RAG 基础概念 - 数据传输协议">#</a></h2>
+
+<h3 id="k1-为什么问答用-sse">为什么问答用 SSE<a class="heading-anchor" href="#k1-为什么问答用-sse" aria-label="Link to 为什么问答用 SSE">#</a></h3>
+<p>大模型生成答案需要时间。如果等完整答案生成后再返回，用户会感觉卡住。</p>
+<p>SSE 可以让后端不断把片段推给前端：</p>
+<pre><code class="language-text">模型生成一点 -&gt; 后端发送一点 -&gt; 前端渲染一点</code></pre>
+<p>后端接口：</p>
+<pre><code class="language-text">GET /api/ragent/rag/v3/chat</code></pre>
+<p>控制器：</p>
+<pre><code class="language-text">RAGChatController</code></pre>
+<p>输出类型：</p>
+<pre><code class="language-text">text/event-stream;charset=UTF-8</code></pre>
+
+<h3 id="k2-sse-和-websocket-的区别">SSE 和 WebSocket 的区别<a class="heading-anchor" href="#k2-sse-和-websocket-的区别" aria-label="Link to SSE 和 WebSocket 的区别">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>对比</th>
+<th>SSE</th>
+<th>WebSocket</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>通信方向</td>
+<td>服务端到客户端为主</td>
+<td>双向</td>
+</tr>
+<tr>
+<td>协议复杂度</td>
+<td>简单</td>
+<td>较复杂</td>
+</tr>
+<tr>
+<td>断线重连</td>
+<td>浏览器原生支持</td>
+<td>需要自己处理</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>大模型流式输出、通知</td>
+<td>实时协作、游戏、双向聊天</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ragent 的问答流是服务端持续推送，所以 SSE 足够。</p>
+
+<h3 id="k3-前端如何接收">前端如何接收<a class="heading-anchor" href="#k3-前端如何接收" aria-label="Link to 前端如何接收">#</a></h3>
+<p>前端相关代码：</p>
+<pre><code class="language-text">frontend/src/hooks/useStreamResponse.ts
+frontend/src/services/chatService.ts
+frontend/src/components/chat/MessageList.tsx
+frontend/src/components/chat/MessageItem.tsx</code></pre>
+<p>学习时重点看：</p>
+<ul>
+<li>前端如何打开 SSE 连接。</li>
+<li>如何解析不同事件类型。</li>
+<li>如何把增量内容追加到消息里。</li>
+<li>用户点击停止时如何调用后端停止接口。</li>
+</ul>
+<p>---</p>
+
+<h2 id="l-rag-基础概念---模型检索生成评估与优化">RAG 基础概念 - 模型检索生成评估与优化<a class="heading-anchor" href="#l-rag-基础概念---模型检索生成评估与优化" aria-label="Link to RAG 基础概念 - 模型检索生成评估与优化">#</a></h2>
+
+<h3 id="l1-rag-效果差应该查哪里">RAG 效果差应该查哪里<a class="heading-anchor" href="#l1-rag-效果差应该查哪里" aria-label="Link to RAG 效果差应该查哪里">#</a></h3>
+<p>不要只盯着最终回答。要按链路排查：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>问题</th>
+<th>排查点</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>答非所问</td>
+<td>看问题改写是否正确</td>
+</tr>
+<tr>
+<td>检索不到</td>
+<td>看知识库是否入库成功</td>
+</tr>
+<tr>
+<td>检索结果不准</td>
+<td>看 chunk 粒度和向量相似度</td>
+</tr>
+<tr>
+<td>答案引用错</td>
+<td>看 Rerank 和 Prompt</td>
+</tr>
+<tr>
+<td>多轮错乱</td>
+<td>看会话记忆和摘要</td>
+</tr>
+<tr>
+<td>工具没调用</td>
+<td>看意图树和 MCP 工具注册</td>
+</tr>
+<tr>
+<td>模型报错</td>
+<td>看模型 Key、供应商响应和路由降级</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="l2-ragent-的-trace-能看什么">Ragent 的 Trace 能看什么<a class="heading-anchor" href="#l2-ragent-的-trace-能看什么" aria-label="Link to Ragent 的 Trace 能看什么">#</a></h3>
+<p>相关表：</p>
+<pre><code class="language-text">t_rag_trace_run
+t_rag_trace_node</code></pre>
+<p>相关类：</p>
+<pre><code class="language-text">RagTraceAspect
+RagTraceContext
+RagTraceRecordService
+RagTraceQueryService</code></pre>
+<p>前端页面：</p>
+<pre><code class="language-text">frontend/src/pages/admin/traces</code></pre>
+<p>Trace 应该关注：</p>
+<ul>
+<li>每个节点耗时。</li>
+<li>输入输出摘要。</li>
+<li>是否有异常。</li>
+<li>检索命中的 chunk。</li>
+<li>最终 Prompt 是否合理。</li>
+</ul>
+
+<h3 id="l3-检索优化方法">检索优化方法<a class="heading-anchor" href="#l3-检索优化方法" aria-label="Link to 检索优化方法">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>优化项</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>分块策略</td>
+<td>结构化文档优先用结构感知分块</td>
+</tr>
+<tr>
+<td>topK</td>
+<td>太小漏召回，太大噪音多</td>
+</tr>
+<tr>
+<td>Rerank</td>
+<td>用重排模型把最相关 chunk 提前</td>
+</tr>
+<tr>
+<td>意图树</td>
+<td>缩小检索范围，提高准确度</td>
+</tr>
+<tr>
+<td>术语映射</td>
+<td>把口语表达映射到业务词</td>
+</tr>
+<tr>
+<td>元数据过滤</td>
+<td>限定知识库、文档类型、业务域</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="l4-生成优化方法">生成优化方法<a class="heading-anchor" href="#l4-生成优化方法" aria-label="Link to 生成优化方法">#</a></h3>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>优化项</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Prompt 边界</td>
+<td>要求基于上下文回答</td>
+</tr>
+<tr>
+<td>答案结构</td>
+<td>让模型按步骤、表格或条目输出</td>
+</tr>
+<tr>
+<td>上下文排序</td>
+<td>高相关内容放前面</td>
+</tr>
+<tr>
+<td>空检索处理</td>
+<td>没查到就提示，不要硬答</td>
+</tr>
+<tr>
+<td>temperature</td>
+<td>知识问答建议低温度</td>
+</tr>
+</tbody>
+</table></div>
+<p>---</p>
+
+      </article>
+    </main>
+  </div>
+  <button class="back-top" id="backTop" aria-label="回到顶部">↑</button>
+  <script src="./site.js"></script>
+</body>
+</html>

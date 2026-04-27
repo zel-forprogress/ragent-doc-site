@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>Ollama vLLM 扫盲</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="ollama-vllm">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -201,8 +201,8 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./ollama-vllm.html#q1-ollama" class="menu-link depth-1" data-heading="Ollama是什么">Ollama是什么</a>
-<a href="./ollama-vllm.html#q2-vllm" class="menu-link depth-1" data-heading="vLLM是什么">vLLM是什么</a>
+          <a href="#q1-ollama" class="menu-link depth-1" data-heading="Ollama是什么">Ollama是什么</a>
+<a href="#q2-vllm" class="menu-link depth-1" data-heading="vLLM是什么">vLLM是什么</a>
         </div>
       </div>
 <div class="menu-group depth-0">
@@ -269,81 +269,79 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="q-ollama-vllm-扫盲">Ollama vLLM 扫盲<a class="heading-anchor" href="#q-ollama-vllm-扫盲" aria-label="Link to Ollama vLLM 扫盲">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
-
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
-<div class="table-wrap"><table>
-<thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
-</tr>
-<tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
-</tr>
-<tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
-</tr>
-<tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
-</tr>
-<tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
-</tr>
-<tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
-</tr>
-<tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
-</tr>
-</tbody>
-</table></div>
-
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="q1-ollama">Ollama<a class="heading-anchor" href="#q1-ollama" aria-label="Link to Ollama">#</a></h3>
+<p>Ollama 适合本地开发和学习：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>安装简单。</li>
+<li>可以本地跑模型。</li>
+<li>有 OpenAI 兼容接口。</li>
+<li>适合没有线上 Key 时调试链路。</li>
+</ul>
+<p>Ragent 已配置 Ollama provider：</p>
+<pre><code class="language-yaml">ollama:
+  url: http://localhost:11434</code></pre>
+<p>候选模型：</p>
+<pre><code class="language-yaml">- id: qwen3-local
+  provider: ollama
+  model: qwen3:8b-fp16</code></pre>
+
+<h3 id="q2-vllm">vLLM<a class="heading-anchor" href="#q2-vllm" aria-label="Link to vLLM">#</a></h3>
+<p>vLLM 更适合生产推理：</p>
+<ul>
+<li>需要 GPU 环境。</li>
+<li>高吞吐。</li>
+<li>支持 OpenAI 兼容接口。</li>
+<li>更适合服务化部署。</li>
+</ul>
+<p>Ragent 当前没有单独写 <code>vllm</code> provider，但因为已有 OpenAI 风格客户端，扩展方式通常是：</p>
+<ul>
+<li>在配置里新增 provider。</li>
+<li>URL 指向 vLLM 服务。</li>
+<li>添加模型候选。</li>
+<li>如果接口兼容，复用现有调用逻辑。</li>
+</ul>
+<p>---</p>
+
+<h2 id="9-ollama-与-vllm-扫盲">Ollama 与 vLLM 扫盲<a class="heading-anchor" href="#9-ollama-与-vllm-扫盲" aria-label="Link to Ollama 与 vLLM 扫盲">#</a></h2>
+<p>Ragent 支持在线模型，也预留了本地模型能力。</p>
+
+<h3 id="91-ollama-是什么">Ollama 是什么<a class="heading-anchor" href="#91-ollama-是什么" aria-label="Link to Ollama 是什么">#</a></h3>
+<p>Ollama 更适合本地开发者快速运行大模型。它的特点：</p>
+<ul>
+<li>安装简单。</li>
+<li>本地运行。</li>
+<li>提供 OpenAI 风格接口。</li>
+<li>适合开发调试。</li>
+</ul>
+<p>Ragent 配置：</p>
+<pre><code class="language-yaml">ai:
+  providers:
+    ollama:
+      url: http://localhost:11434
+      endpoints:
+        chat: /v1/chat/completions
+        embedding: /v1/embeddings</code></pre>
+<p>本地候选模型：</p>
+<pre><code class="language-yaml">- id: qwen3-local
+  provider: ollama
+  model: qwen3:8b-fp16</code></pre>
+
+<h3 id="92-vllm-是什么">vLLM 是什么<a class="heading-anchor" href="#92-vllm-是什么" aria-label="Link to vLLM 是什么">#</a></h3>
+<p>vLLM 更偏生产推理服务，适合 GPU 环境下部署大模型，特点是：</p>
+<ul>
+<li>高吞吐。</li>
+<li>支持连续批处理。</li>
+<li>支持 OpenAI 兼容接口。</li>
+<li>更适合服务化部署。</li>
+</ul>
+<p>当前源码里还没有独立 <code>vllm</code> provider，但因为 <code>infra-ai</code> 的客户端是 OpenAI 风格抽象，所以后续扩展 vLLM 不难：</p>
+<ul>
+<li>增加 provider 配置。</li>
+<li>指向 vLLM 的 OpenAI 兼容地址。</li>
+<li>增加候选模型。</li>
+<li>如果协议完全兼容，甚至可以复用现有 OpenAI 风格客户端。</li>
 </ul>
 <p>---</p>
 

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>AI 知识库建设</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="knowledge-base">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -185,14 +185,14 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./knowledge-base.html#p1-知识库建设主流程" class="menu-link depth-1" data-heading="知识库对象">知识库对象</a>
-<a href="./knowledge-base.html#p2-关键接口" class="menu-link depth-1" data-heading="文档上传">文档上传</a>
-<a href="./knowledge-base.html#p3-普通分块模式" class="menu-link depth-1" data-heading="文件存储">文件存储</a>
-<a href="./knowledge-base.html#p4-pipeline-模式" class="menu-link depth-1" data-heading="文档解析">文档解析</a>
-<a href="./knowledge-base.html#85-文档分块" class="menu-link depth-1" data-heading="文档分块">文档分块</a>
-<a href="./knowledge-base.html#86-向量化" class="menu-link depth-1" data-heading="向量化">向量化</a>
-<a href="./knowledge-base.html#87-异步入库" class="menu-link depth-1" data-heading="异步入库">异步入库</a>
-<a href="./knowledge-base.html#88-pipeline-入库" class="menu-link depth-1" data-heading="Pipeline入库">Pipeline入库</a>
+          <a href="#p1-知识库建设主流程" class="menu-link depth-1" data-heading="知识库对象">知识库对象</a>
+<a href="#p2-关键接口" class="menu-link depth-1" data-heading="文档上传">文档上传</a>
+<a href="#p3-普通分块模式" class="menu-link depth-1" data-heading="文件存储">文件存储</a>
+<a href="#p4-pipeline-模式" class="menu-link depth-1" data-heading="文档解析">文档解析</a>
+<a href="#85-文档分块" class="menu-link depth-1" data-heading="文档分块">文档分块</a>
+<a href="#86-向量化" class="menu-link depth-1" data-heading="向量化">向量化</a>
+<a href="#87-异步入库" class="menu-link depth-1" data-heading="异步入库">异步入库</a>
+<a href="#88-pipeline-入库" class="menu-link depth-1" data-heading="Pipeline入库">Pipeline入库</a>
         </div>
       </div>
 <div class="menu-group depth-0">
@@ -269,82 +269,195 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="p-ai-知识库建设">AI 知识库建设<a class="heading-anchor" href="#p-ai-知识库建设" aria-label="Link to AI 知识库建设">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
+<h3 id="p1-知识库建设主流程">知识库建设主流程<a class="heading-anchor" href="#p1-知识库建设主流程" aria-label="Link to 知识库建设主流程">#</a></h3>
+<pre><code class="language-text">创建知识库
+  -&gt; 上传文档
+  -&gt; 保存原始文件到 RustFS
+  -&gt; 保存文档记录到 PostgreSQL
+  -&gt; 发送 RocketMQ 分块消息
+  -&gt; 消费消息执行解析、分块、Embedding
+  -&gt; 保存 chunk
+  -&gt; 写入 t_knowledge_vector</code></pre>
 
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
-
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="p2-关键接口">关键接口<a class="heading-anchor" href="#p2-关键接口" aria-label="Link to 关键接口">#</a></h3>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>功能</th>
+<th>接口</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td>创建知识库</td>
+<td><code>POST /knowledge-base</code></td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td>上传文档</td>
+<td><code>POST /knowledge-base/{kb-id}/docs/upload</code></td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
+<td>开始分块</td>
+<td><code>POST /knowledge-base/docs/{doc-id}/chunk</code></td>
 </tr>
 <tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
+<td>查看分块</td>
+<td><code>GET /knowledge-base/docs/{doc-id}/chunks</code></td>
 </tr>
 <tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
+<td>查看日志</td>
+<td><code>GET /knowledge-base/docs/{docId}/chunk-logs</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>实际前缀都是：</p>
+<pre><code class="language-text">/api/ragent</code></pre>
+
+<h3 id="p3-普通分块模式">普通分块模式<a class="heading-anchor" href="#p3-普通分块模式" aria-label="Link to 普通分块模式">#</a></h3>
+<p>对应 <code>ProcessMode.CHUNK</code>。</p>
+<p>流程：</p>
+<pre><code class="language-text">读取文件 -&gt; Tika 解析 -&gt; 分块策略 -&gt; Embedding -&gt; 写 chunk 和 vector</code></pre>
+
+<h3 id="p4-pipeline-模式">Pipeline 模式<a class="heading-anchor" href="#p4-pipeline-模式" aria-label="Link to Pipeline 模式">#</a></h3>
+<p>对应 <code>ProcessMode.PIPELINE</code>。</p>
+<p>它把文档处理拆成节点：</p>
+<pre><code class="language-text">FetcherNode -&gt; ParserNode -&gt; ChunkerNode -&gt; EnhancerNode -&gt; EnricherNode -&gt; IndexerNode</code></pre>
+<p>核心引擎：</p>
+<pre><code class="language-text">IngestionEngine</code></pre>
+<p>这个设计更适合扩展，例如以后加 OCR、表格增强、摘要增强、元数据抽取，都可以加节点。</p>
+<p>---</p>
+
+<h2 id="8-ai-知识库建设">AI 知识库建设<a class="heading-anchor" href="#8-ai-知识库建设" aria-label="Link to AI 知识库建设">#</a></h2>
+<p>知识库建设是 RAG 的“粮仓”。如果入库质量差，后面模型再强也很难答好。</p>
+
+<h3 id="81-知识库对象">知识库对象<a class="heading-anchor" href="#81-知识库对象" aria-label="Link to 知识库对象">#</a></h3>
+<p>知识库表：</p>
+<pre><code class="language-text">t_knowledge_base</code></pre>
+<p>核心字段：</p>
+<ul>
+<li><code>name</code>：知识库名称。</li>
+<li><code>embedding_model</code>：使用哪个 Embedding 模型。</li>
+<li><code>collection_name</code>：向量集合名。</li>
+</ul>
+<p>对应服务：</p>
+<pre><code class="language-text">KnowledgeBaseServiceImpl</code></pre>
+
+<h3 id="82-文档上传">文档上传<a class="heading-anchor" href="#82-文档上传" aria-label="Link to 文档上传">#</a></h3>
+<p>文档表：</p>
+<pre><code class="language-text">t_knowledge_document</code></pre>
+<p>上传接口：</p>
+<pre><code class="language-text">POST /api/ragent/knowledge-base/{kb-id}/docs/upload</code></pre>
+<p>核心服务：</p>
+<pre><code class="language-text">KnowledgeDocumentServiceImpl.upload</code></pre>
+<p>上传后不会立刻完成入库，而是先保存文档元信息和文件地址。</p>
+
+<h3 id="83-文件存储">文件存储<a class="heading-anchor" href="#83-文件存储" aria-label="Link to 文件存储">#</a></h3>
+<p>上传的原始文件存在 RustFS。</p>
+<p>核心类：</p>
+<pre><code class="language-text">S3FileStorageService</code></pre>
+<p>为什么用对象存储：</p>
+<ul>
+<li>数据库不适合保存大文件。</li>
+<li>文件和元数据分开，便于扩展。</li>
+<li>RustFS 兼容 S3 API，开发环境部署简单。</li>
+</ul>
+
+<h3 id="84-文档解析">文档解析<a class="heading-anchor" href="#84-文档解析" aria-label="Link to 文档解析">#</a></h3>
+<p>Ragent 使用解析器把文件变成纯文本。</p>
+<p>核心类：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>DocumentParser</code></td>
+<td>解析接口</td>
 </tr>
 <tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
+<td><code>DocumentParserSelector</code></td>
+<td>解析器选择</td>
 </tr>
 <tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
+<td><code>TikaDocumentParser</code></td>
+<td>使用 Apache Tika 解析常见文档</td>
 </tr>
 <tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
+<td><code>MarkdownDocumentParser</code></td>
+<td>Markdown 解析</td>
 </tr>
 <tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td><code>TextCleanupUtil</code></td>
+<td>文本清洗</td>
 </tr>
 </tbody>
 </table></div>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="85-文档分块">文档分块<a class="heading-anchor" href="#85-文档分块" aria-label="Link to 文档分块">#</a></h3>
+<p>分块是 RAG 的关键环节。</p>
+<p>核心接口：</p>
+<pre><code class="language-text">ChunkingStrategy</code></pre>
+<p>已实现策略：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>策略</th>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>固定长度</td>
+<td><code>FixedSizeTextChunker</code></td>
+<td>按固定字符数切分</td>
+</tr>
+<tr>
+<td>结构感知</td>
+<td><code>StructureAwareTextChunker</code></td>
+<td>尽量按标题、段落等边界切分</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3 id="86-向量化">向量化<a class="heading-anchor" href="#86-向量化" aria-label="Link to 向量化">#</a></h3>
+<p>分块之后要生成 Embedding。</p>
+<p>核心类：</p>
+<pre><code class="language-text">ChunkEmbeddingService
+EmbeddingService
+RoutingEmbeddingService</code></pre>
+<p>默认 Embedding 配置：</p>
+<pre><code class="language-yaml">ai:
+  embedding:
+    default-model: qwen-emb-8b</code></pre>
+
+<h3 id="87-异步入库">异步入库<a class="heading-anchor" href="#87-异步入库" aria-label="Link to 异步入库">#</a></h3>
+<p>点击“开始分块”后，Ragent 通过 RocketMQ 发消息：</p>
+<pre><code class="language-text">knowledge-document-chunk_topic</code></pre>
+<p>消费类：</p>
+<pre><code class="language-text">KnowledgeDocumentChunkConsumer</code></pre>
+<p>这样做的好处：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li>上传接口不会卡很久。</li>
+<li>分块失败可以记录状态。</li>
+<li>入库任务可以异步重试和追踪。</li>
 </ul>
+
+<h3 id="88-pipeline-入库">Pipeline 入库<a class="heading-anchor" href="#88-pipeline-入库" aria-label="Link to Pipeline 入库">#</a></h3>
+<p>除了普通分块模式，Ragent 还有 Pipeline 模式。</p>
+<p>核心类：</p>
+<ul>
+<li><code>IngestionEngine</code></li>
+<li><code>IngestionNode</code></li>
+<li><code>FetcherNode</code></li>
+<li><code>ParserNode</code></li>
+<li><code>ChunkerNode</code></li>
+<li><code>EnhancerNode</code></li>
+<li><code>EnricherNode</code></li>
+<li><code>IndexerNode</code></li>
+</ul>
+<p>Pipeline 的思想：</p>
+<pre><code class="language-text">把文档处理拆成多个节点，每个节点只做一件事，节点之间通过上下文传递结果。</code></pre>
+<p>这比写死一个固定流程更灵活。</p>
 <p>---</p>
 
       </article>

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ragent 开源项目学习文档</title>
+  <title>AI 知识问答</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="index">
+<body data-page="ai-qa">
   <div class="reading-progress" id="readingProgress"></div>
   <header class="topbar">
     <button class="icon-button only-mobile" id="menuToggle" aria-label="打开目录">☰</button>
@@ -25,7 +25,7 @@
         <input id="searchInput" type="search" placeholder="搜索菜单，例如 RAG、Redis、MCP" />
       </div>
       <nav class="nav" id="nav">
-        <a href="#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
+        <a href="./index.html#a-ragent" class="menu-link depth-0" data-heading="Ragent（已更新60+文章）">Ragent（已更新60+文章）</a>
 <a href="./online-demo.html#b-在线体验-ragent-ai" class="menu-link depth-0" data-heading="在线体验Ragent AI">在线体验Ragent AI</a>
 <a href="./resume.html#c-rag-项目经验如何写进简历" class="menu-link depth-0" data-heading="RAG项目经验如何写进简历">RAG项目经验如何写进简历<span class="menu-badge">HOT</span></a>
 <div class="menu-group depth-0">
@@ -158,12 +158,12 @@
           <span class="chevron">›</span>
         </button>
         <div class="menu-children">
-          <a href="./ai-qa.html#n1-用户提问后发生了什么" class="menu-link depth-1" data-heading="会话记忆">会话记忆</a>
-<a href="./ai-qa.html#n2-streamchatpipeline-逐行理解" class="menu-link depth-1" data-heading="问题改写">问题改写</a>
-<a href="./ai-qa.html#n3-问答链路中的关键设计" class="menu-link depth-1" data-heading="意图识别">意图识别</a>
-<a href="./ai-qa.html#64-多通道检索" class="menu-link depth-1" data-heading="多通道检索">多通道检索</a>
-<a href="./ai-qa.html#65-prompt-构建" class="menu-link depth-1" data-heading="Prompt构建">Prompt构建</a>
-<a href="./ai-qa.html#66-流式输出" class="menu-link depth-1" data-heading="流式输出">流式输出</a>
+          <a href="#n1-用户提问后发生了什么" class="menu-link depth-1" data-heading="会话记忆">会话记忆</a>
+<a href="#n2-streamchatpipeline-逐行理解" class="menu-link depth-1" data-heading="问题改写">问题改写</a>
+<a href="#n3-问答链路中的关键设计" class="menu-link depth-1" data-heading="意图识别">意图识别</a>
+<a href="#64-多通道检索" class="menu-link depth-1" data-heading="多通道检索">多通道检索</a>
+<a href="#65-prompt-构建" class="menu-link depth-1" data-heading="Prompt构建">Prompt构建</a>
+<a href="#66-流式输出" class="menu-link depth-1" data-heading="流式输出">流式输出</a>
         </div>
       </div>
 <div class="menu-group depth-0">
@@ -269,81 +269,223 @@
     </aside>
     <main class="content">
       <article class="doc" id="doc">
-        <h1 id="ragent-开源项目平替学习文档">Ragent 开源项目平替学习文档<a class="heading-anchor" href="#ragent-开源项目平替学习文档" aria-label="Link to Ragent 开源项目平替学习文档">#</a></h1>
-<blockquote>说明：本文不是官网付费内容的搬运，也不复刻原文。本文根据 <code>https://nageoffer.com/ragent/</code> 页面左侧可见菜单、本地 Ragent 源码、配置文件、数据库脚本和前端代码整理而成，目标是帮助你不依赖付费文章也能系统理解、启动、调试和讲清楚这个项目。</blockquote>
-<blockquote>使用建议：如果你是为了学习，请优先阅读下面的“官网菜单逐项学习版”。后面的“项目总览版”更像速查附录。本文会尽量做到每个菜单项都有四块内容：先讲人话版概念，再讲 Ragent 代码落点，再给实践步骤，最后给面试表达。</blockquote>
-<p>---</p>
+        <h2 id="n-ai-知识问答">AI 知识问答<a class="heading-anchor" href="#n-ai-知识问答" aria-label="Link to AI 知识问答">#</a></h2>
 
-<h1 id="官网菜单逐项学习版">官网菜单逐项学习版<a class="heading-anchor" href="#官网菜单逐项学习版" aria-label="Link to 官网菜单逐项学习版">#</a></h1>
-<p>这一部分按官网左侧菜单重新组织。你可以把它当成一套从 0 到 1 学 Ragent 的课程笔记。</p>
-<p>---</p>
+<h3 id="n1-用户提问后发生了什么">用户提问后发生了什么<a class="heading-anchor" href="#n1-用户提问后发生了什么" aria-label="Link to 用户提问后发生了什么">#</a></h3>
+<p>完整链路：</p>
+<pre><code class="language-text">前端 ChatInput
+  -&gt; chatService 发起 SSE
+  -&gt; RAGChatController
+  -&gt; RAGChatServiceImpl
+  -&gt; StreamChatPipeline
+  -&gt; LLMService 流式输出
+  -&gt; 前端 MessageItem 增量渲染</code></pre>
 
-<h2 id="a-ragent">Ragent<a class="heading-anchor" href="#a-ragent" aria-label="Link to Ragent">#</a></h2>
+<h3 id="n2-streamchatpipeline-逐行理解">StreamChatPipeline 逐行理解<a class="heading-anchor" href="#n2-streamchatpipeline-逐行理解" aria-label="Link to StreamChatPipeline 逐行理解">#</a></h3>
+<p><code>StreamChatPipeline.execute</code> 是问答链路最值得读的代码。它的步骤：</p>
+<pre><code class="language-text">loadMemory(ctx)
+rewriteQuery(ctx)
+resolveIntents(ctx)
+handleGuidance(ctx)
+handleSystemOnly(ctx)
+retrieve(ctx)
+handleEmptyRetrieval(ctx, retrievalCtx)
+streamRagResponse(ctx, retrievalCtx)</code></pre>
+<p>翻译成人话：</p>
+<ul>
+<li>把历史对话拿出来。</li>
+<li>把用户问题改写成更完整的问题。</li>
+<li>判断问题属于哪些意图。</li>
+<li>如果问题太模糊，先反问用户。</li>
+<li>如果是系统类回答，不检索知识库。</li>
+<li>否则进入检索。</li>
+<li>如果没检索到，直接提示没有相关内容。</li>
+<li>如果检索到，组装 Prompt 并调用模型。</li>
+</ul>
 
-<h3 id="a1-这个项目到底是什么">这个项目到底是什么<a class="heading-anchor" href="#a1-这个项目到底是什么" aria-label="Link to 这个项目到底是什么">#</a></h3>
-<p>Ragent 是一个基于 Java 17、Spring Boot 3、React、PostgreSQL/pgvector、Redis、RocketMQ 和对象存储的 RAG 智能问答系统。</p>
-<p>一句话理解：</p>
-<pre><code class="language-text">Ragent = 知识库管理 + 文档入库 + 向量检索 + 大模型问答 + MCP 工具调用 + 后台管理 + Trace 排障</code></pre>
-<p>很多入门项目只做了这条链路：</p>
-<pre><code class="language-text">用户问题 -&gt; 调大模型 -&gt; 返回答案</code></pre>
-<p>Ragent 做的是更完整的工程链路：</p>
-<pre><code class="language-text">文档上传 -&gt; 文档解析 -&gt; 文本分块 -&gt; Embedding -&gt; 向量入库
-用户提问 -&gt; 加载历史 -&gt; 问题改写 -&gt; 意图识别 -&gt; 检索/工具调用 -&gt; Prompt 组装 -&gt; 模型流式回答 -&gt; Trace 记录</code></pre>
-
-<h3 id="a2-你应该从哪些源码入口看">你应该从哪些源码入口看<a class="heading-anchor" href="#a2-你应该从哪些源码入口看" aria-label="Link to 你应该从哪些源码入口看">#</a></h3>
+<h3 id="n3-问答链路中的关键设计">问答链路中的关键设计<a class="heading-anchor" href="#n3-问答链路中的关键设计" aria-label="Link to 问答链路中的关键设计">#</a></h3>
 <div class="table-wrap"><table>
 <thead><tr>
-<th>学习目标</th>
-<th>推荐入口</th>
+<th>设计</th>
+<th>作用</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>项目如何启动</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/RagentApplication.java</code></td>
+<td><code>@ChatRateLimit</code></td>
+<td>控制并发问答，避免模型被打爆</td>
 </tr>
 <tr>
-<td>后端配置</td>
-<td><code>bootstrap/src/main/resources/application.yaml</code></td>
+<td><code>RagTraceNode</code></td>
+<td>记录 RAG 节点</td>
 </tr>
 <tr>
-<td>前端入口</td>
-<td><code>frontend/src/main.tsx</code>、<code>frontend/src/router.tsx</code></td>
+<td><code>StreamTaskManager</code></td>
+<td>支持停止生成</td>
 </tr>
 <tr>
-<td>问答入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/controller/RAGChatController.java</code></td>
+<td><code>GuidanceDecision</code></td>
+<td>问题模糊时先澄清</td>
 </tr>
 <tr>
-<td>问答编排</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/rag/service/pipeline/StreamChatPipeline.java</code></td>
+<td><code>RetrievalContext</code></td>
+<td>聚合知识库和 MCP 上下文</td>
+</tr>
+</tbody>
+</table></div>
+<p>---</p>
+
+<h2 id="6-ai-知识问答链路">AI 知识问答链路<a class="heading-anchor" href="#6-ai-知识问答链路" aria-label="Link to AI 知识问答链路">#</a></h2>
+<p>Ragent 的问答入口是：</p>
+<pre><code class="language-text">GET /api/ragent/rag/v3/chat</code></pre>
+<p>核心执行类是：</p>
+<pre><code class="language-text">RAGChatServiceImpl -&gt; StreamChatPipeline</code></pre>
+<p><code>StreamChatPipeline</code> 的执行顺序可以概括为：</p>
+<ul>
+<li>加载会话记忆。</li>
+<li>问题改写和拆分。</li>
+<li>意图识别。</li>
+<li>判断是否需要澄清。</li>
+<li>判断是否是纯系统回答。</li>
+<li>检索知识库或调用 MCP。</li>
+<li>如果检索为空，返回提示。</li>
+<li>构建 Prompt。</li>
+<li>调用大模型流式输出。</li>
+</ul>
+<p>对应代码逻辑：</p>
+<pre><code class="language-text">loadMemory(ctx)
+rewriteQuery(ctx)
+resolveIntents(ctx)
+handleGuidance(ctx)
+handleSystemOnly(ctx)
+retrieve(ctx)
+handleEmptyRetrieval(ctx, retrievalCtx)
+streamRagResponse(ctx, retrievalCtx)</code></pre>
+
+<h3 id="61-会话记忆">会话记忆<a class="heading-anchor" href="#61-会话记忆" aria-label="Link to 会话记忆">#</a></h3>
+<p>会话记忆的目的：让模型知道“用户前面说过什么”。</p>
+<p>核心类：</p>
+<ul>
+<li><code>ConversationMemoryService</code></li>
+<li><code>DefaultConversationMemoryService</code></li>
+<li><code>JdbcConversationMemoryStore</code></li>
+<li><code>JdbcConversationMemorySummaryService</code></li>
+</ul>
+<p>数据表：</p>
+<ul>
+<li><code>t_conversation</code></li>
+<li><code>t_message</code></li>
+<li><code>t_conversation_summary</code></li>
+</ul>
+
+<h3 id="62-问题改写">问题改写<a class="heading-anchor" href="#62-问题改写" aria-label="Link to 问题改写">#</a></h3>
+<p>用户问题常常不适合直接检索，比如：</p>
+<pre><code class="language-text">它怎么申请？</code></pre>
+<p>系统需要结合上下文改写成：</p>
+<pre><code class="language-text">员工报销流程如何申请？</code></pre>
+<p>对应类：</p>
+<ul>
+<li><code>QueryRewriteService</code></li>
+<li><code>MultiQuestionRewriteService</code></li>
+<li><code>RewriteResult</code></li>
+</ul>
+
+<h3 id="63-意图识别">意图识别<a class="heading-anchor" href="#63-意图识别" aria-label="Link to 意图识别">#</a></h3>
+<p>意图识别用于判断问题属于哪个业务方向：</p>
+<ul>
+<li>是查知识库？</li>
+<li>是调 MCP 工具？</li>
+<li>是普通系统回答？</li>
+<li>是需要澄清？</li>
+</ul>
+<p>核心类：</p>
+<ul>
+<li><code>IntentResolver</code></li>
+<li><code>DefaultIntentClassifier</code></li>
+<li><code>IntentTreeFactory</code></li>
+<li><code>IntentNodeRegistry</code></li>
+<li><code>IntentGuidanceService</code></li>
+</ul>
+<p>数据表：</p>
+<pre><code class="language-text">t_intent_node</code></pre>
+
+<h3 id="64-多通道检索">多通道检索<a class="heading-anchor" href="#64-多通道检索" aria-label="Link to 多通道检索">#</a></h3>
+<p>Ragent 不是只做单一路径向量检索，而是有多通道检索引擎：</p>
+<pre><code class="language-text">MultiChannelRetrievalEngine</code></pre>
+<p>它会收集所有启用的 <code>SearchChannel</code>，并行执行，再走后处理器链。</p>
+<p>已实现的通道：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>通道</th>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>全局向量检索</td>
+<td><code>VectorGlobalSearchChannel</code></td>
+<td>在相关知识空间中做向量相似度检索</td>
 </tr>
 <tr>
-<td>知识库入口</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/controller/KnowledgeBaseController.java</code></td>
+<td>意图定向检索</td>
+<td><code>IntentDirectedSearchChannel</code></td>
+<td>根据意图节点定向检索对应知识库</td>
+</tr>
+</tbody>
+</table></div>
+<p>后处理器：</p>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>后处理器</th>
+<th>类</th>
+<th>说明</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>去重</td>
+<td><code>DeduplicationPostProcessor</code></td>
+<td>去掉重复 chunk</td>
 </tr>
 <tr>
-<td>文档入库</td>
-<td><code>bootstrap/src/main/java/com/nageoffer/ai/ragent/knowledge/service/impl/KnowledgeDocumentServiceImpl.java</code></td>
-</tr>
-<tr>
-<td>模型调用</td>
-<td><code>infra-ai/src/main/java/com/nageoffer/ai/ragent/infra</code></td>
-</tr>
-<tr>
-<td>MCP 服务</td>
-<td><code>mcp-server/src/main/java/com/nageoffer/ai/ragent/mcp</code></td>
+<td>重排</td>
+<td><code>RerankPostProcessor</code></td>
+<td>调用 Rerank 模型重新排序</td>
 </tr>
 </tbody>
 </table></div>
 
-<h3 id="a3-项目学习主线">项目学习主线<a class="heading-anchor" href="#a3-项目学习主线" aria-label="Link to 项目学习主线">#</a></h3>
-<p>建议你不要一开始就陷进每个类，而是按这 5 条线学：</p>
+<h3 id="65-prompt-构建">Prompt 构建<a class="heading-anchor" href="#65-prompt-构建" aria-label="Link to Prompt 构建">#</a></h3>
+<p>检索到内容后，需要把它组织成模型能理解的 Prompt。</p>
+<p>核心类：</p>
 <ul>
-<li>启动线：Docker 中间件、数据库、MCP、后端、前端。</li>
-<li>数据线：文档从上传到向量入库。</li>
-<li>问答线：问题从前端输入到模型流式输出。</li>
-<li>模型线：Chat、Embedding、Rerank 如何调度。</li>
-<li>排障线：Trace、日志、中间件状态怎么定位问题。</li>
+<li><code>RAGPromptService</code></li>
+<li><code>PromptContext</code></li>
+<li><code>DefaultContextFormatter</code></li>
+<li><code>PromptTemplateLoader</code></li>
+</ul>
+<p>Prompt 通常包含：</p>
+<ul>
+<li>用户问题。</li>
+<li>改写后的问题。</li>
+<li>知识库上下文。</li>
+<li>MCP 工具结果。</li>
+<li>意图信息。</li>
+<li>历史对话。</li>
+</ul>
+
+<h3 id="66-流式输出">流式输出<a class="heading-anchor" href="#66-流式输出" aria-label="Link to 流式输出">#</a></h3>
+<p>Ragent 使用 SSE 给前端输出答案。</p>
+<p>核心类：</p>
+<ul>
+<li><code>StreamCallback</code></li>
+<li><code>StreamChatEventHandler</code></li>
+<li><code>SseEmitterSender</code></li>
+<li><code>StreamTaskManager</code></li>
+</ul>
+<p>前端对应：</p>
+<ul>
+<li><code>frontend/src/hooks/useStreamResponse.ts</code></li>
+<li><code>frontend/src/services/chatService.ts</code></li>
+<li><code>frontend/src/components/chat/MessageItem.tsx</code></li>
 </ul>
 <p>---</p>
 
